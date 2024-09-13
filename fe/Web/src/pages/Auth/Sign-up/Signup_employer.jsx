@@ -19,11 +19,11 @@ const SignupEmployeer = ({ registerHandler }) => {
 
   const handleGoogleLogin = (event) => {
     event.preventDefault();
-    window.location.assign('https://localhost:7282/api/Auth/LoginGoogle?role=Employer');
+    window.location.assign('https://localhost:5001/api/Auth/LoginGoogle?role=Employer');
   };
   const handleFacebookLogin = (event) => {
     event.preventDefault();
-    // window.location.assign('https://localhost:7282/api/Auth/signin-facebook?role=Employer');
+    // window.location.assign('https://localhost:5001/api/Auth/signin-facebook?role=Employer');
     Swal.fire('Info', 'This function is currently under maintenance!', 'info');
   }
 

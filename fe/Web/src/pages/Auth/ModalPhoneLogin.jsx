@@ -47,7 +47,7 @@ const ModalPhoneLogin = ({ isOpen, onClose }) => {
 
     try {
       const response = await axios.post(
-        `https://localhost:7282/api/Auth/CheckPhoneNumber`,
+        `https://localhost:5001/api/Auth/CheckPhoneNumber`,
         {
           PhoneNumber: convertPhoneNumber(phoneNumber),
         }
@@ -104,7 +104,7 @@ const ModalPhoneLogin = ({ isOpen, onClose }) => {
       const result = await confirmationResult.confirm(otp);
       try {
         const response = await axios.post(
-          `https://localhost:7282/api/Auth/LoginWithPhoneNumber`,
+          `https://localhost:5001/api/Auth/LoginWithPhoneNumber`,
           {
             PhoneNumber: convertPhoneNumber(phoneNumber),
           }

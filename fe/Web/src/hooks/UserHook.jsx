@@ -1,6 +1,6 @@
 import axios from "axios";
 import Swal from "sweetalert2";
-const apiURL = "https://localhost:7282/api";
+const apiURL = "https://localhost:5001/api";
 
 const UserHook = {
   GetAllUsers: async () => {
@@ -59,7 +59,7 @@ const UserHook = {
   },
   GetUser2FAStatus: async (id) => {
     try {
-      const response = await axios.get(`https://localhost:7282/api/Home/${id}`);
+      const response = await axios.get(`https://localhost:5001/api/Home/${id}`);
       return response.data;
     } catch (e) {
       console.error(`Cant get user two factor status! ${e}`);
@@ -68,7 +68,7 @@ const UserHook = {
   SetUser2FAStatus: async (id, status) => {
     try {
       const response = await axios.put(
-        `https://localhost:7282/api/Home/Check2FA/${id}`,
+        `https://localhost:5001/api/Home/Check2FA/${id}`,
         status
       );
       return response.data;

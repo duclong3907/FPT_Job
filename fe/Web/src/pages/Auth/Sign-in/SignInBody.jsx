@@ -19,7 +19,7 @@ const LoginBody = () => {
 
   const handleGoogleLogin = (event) => {
     event.preventDefault();
-    window.location.assign('https://localhost:7282/api/Auth/LoginGoogle?role=JobSeeker');
+    window.location.assign('https://localhost:5001/api/Auth/LoginGoogle?role=JobSeeker');
   };
 
   const handlePhoneLogin = (event) => {

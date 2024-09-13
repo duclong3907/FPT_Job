@@ -4,7 +4,7 @@ let connection = null;
 
 export const createConnection = (username) => {
     connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://localhost:7282/chatHub?username=" + username)
+        .withUrl("https://localhost:5001/chatHub?username=" + username)
         .build();
 
     connection.start()

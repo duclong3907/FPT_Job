@@ -1,6 +1,6 @@
 import axios from "axios";
 import Swal from "sweetalert2";
-const apiURL = "https://localhost:7282/api";
+const apiURL = "https://localhost:5001/api";
 
 const CategoryHook = {
   GetAllCategory: async () => {

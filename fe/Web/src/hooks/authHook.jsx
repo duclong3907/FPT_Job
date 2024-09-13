@@ -8,7 +8,7 @@ const useAuth = () => {
   const login = async (username, password) => {
     try {
       const response = await axios.post(
-        "https://localhost:7282/api/Auth/Login",
+        "https://localhost:5001/api/Auth/Login",
         {
           UserName: username,
           Password: password,
@@ -45,7 +45,7 @@ const useAuth = () => {
   const forgotPassword = async (email) => {
     try {
       const response = await axios.post(
-        "https://localhost:7282/api/Auth/ForgotPassword",
+        "https://localhost:5001/api/Auth/ForgotPassword",
         { email },
         {
           headers: {
@@ -63,7 +63,7 @@ const useAuth = () => {
   const resetPassword = async (newPassword, id) => {
     try {
       const response = await axios.put(
-        `https://localhost:7282/api/Auth/ResetPassword/${id}`,
+        `https://localhost:5001/api/Auth/ResetPassword/${id}`,
         { NewPassword: newPassword },
         {
           headers: {
@@ -83,7 +83,7 @@ const useAuth = () => {
   const confirmOTP = async (username, otp) => {
     try {
       const response = await axios.post(
-        "https://localhost:7282/api/Auth/Login-2FA-Email",
+        "https://localhost:5001/api/Auth/Login-2FA-Email",
         {
           UserName: username,
           otp: otp,
@@ -147,7 +147,7 @@ const useAuth = () => {
     };
     try {
       const response = await axios.post(
-        "https://localhost:7282/api/Auth/Register",
+        "https://localhost:5001/api/Auth/Register",
         user
       );
       Swal.fire("Successful", response.data, "success");

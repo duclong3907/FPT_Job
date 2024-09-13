@@ -8,7 +8,7 @@ import { Form, Button } from "react-bootstrap";
 const toggle2FA = async (userId, enable) => {
   try {
     const response = await axios.put(
-      `https://localhost:7282/api/Home/Check2FA/${userId}`,
+      `https://localhost:5001/api/Home/Check2FA/${userId}`,
       { enable }
     );
     Swal.fire({
