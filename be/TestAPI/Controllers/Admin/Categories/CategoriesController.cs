@@ -37,6 +37,21 @@ namespace TestAPI.Controllers.Admin.Categories
             }
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            try
+            {
+                var jobCategoies = await _context.JobCategories.FirstOrDefaultAsync(j => j.Id == id);
+                if (jobCategoies == null) return NotFound(new { message = "Id not found" });
+                return Ok(jobCategoies);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving the job" });
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post(JobCategories category)
         {

@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import '../category/job_category_model.dart';
 
 part 'job_model.g.dart';
 
@@ -27,6 +28,7 @@ class Job {
   @JsonKey(name: 'updated_At')
   DateTime? updatedAt;
   int? deleted;
+  JobCategory? jobCategory;
 
   Job({
     required this.id,
@@ -44,6 +46,7 @@ class Job {
     this.createdAt,
     this.updatedAt,
     this.deleted,
+    this.jobCategory,
   });
 
   factory Job.fromJson(Map<String, dynamic> json) => _$JobFromJson(json);

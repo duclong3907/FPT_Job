@@ -27,6 +27,9 @@ Job _$JobFromJson(Map<String, dynamic> json) => Job(
           ? null
           : DateTime.parse(json['updated_At'] as String),
       deleted: (json['deleted'] as num?)?.toInt(),
+      jobCategory: json['jobCategory'] == null
+          ? null
+          : JobCategory.fromJson(json['jobCategory'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
@@ -45,4 +48,5 @@ Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'created_At': instance.createdAt?.toIso8601String(),
       'updated_At': instance.updatedAt?.toIso8601String(),
       'deleted': instance.deleted,
+      'jobCategory': instance.jobCategory,
     };

@@ -1,37 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobile/models/job_model.dart';
-import '../config/config_html.dart';
+import 'package:mobile/models/job/job_model.dart';
 import '../repository/job_repos.dart';
 import '../utils/time_ago.dart';
 import '../view_models/job_view_model.dart';
-import 'header.dart';
-import 'search_bar.dart';
+import '../views/job_detail_screen.dart';
 
 class JobList extends StatelessWidget {
-  final jobViewModel = Get.put(JobViewModel(jobRepository: JobRepository()));
+  // final jobViewModel = Get.put(JobViewModel(jobRepository: JobRepository()));
+  final jobViewModel = Get.find<JobViewModel>();
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (jobViewModel.jobs.isEmpty) {
-        return Center(child: CircularProgressIndicator());
-      }
+      // if (jobViewModel.jobs.isEmpty) {
+      //   return Center(child: CircularProgressIndicator());
+      // }
       return Expanded(
         child: ListView.builder(
           shrinkWrap: true,
           itemCount: jobViewModel.jobs.length,
           itemBuilder: (context, index) {
             final job = jobViewModel.jobs[index];
-            return Card(
-              margin: EdgeInsets.all(16),
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+            return GestureDetector(
+              child: Card(
+                margin: EdgeInsets.all(16),
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: LayoutBuilder(builder: (context, constraints) {
+                  return itemCard(job: job);
+                }),
               ),
-              child: LayoutBuilder(builder: (context, constraints) {
-                return itemCard(job: job);
-              }),
+            onTap: () => Get.to(() => JobDetailScreen(jobId: job.id)),
             );
           },
         ),
