@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
-import '../views/home_page.dart';
-import '../views/main_page.dart';
+import 'package:mobile/views/splash_screen.dart';
+import 'package:mobile/widgets/job_list.dart';
+import '../views/home_screen.dart';
 
 class AppRoutes {
-  static const String main = '/';
+  static const String splash = '/';
   static const String homePage = '/home';
+  static const String jobDetail = '/job-detail';
+  static const String jobList = '/job';
 
   static Map<String, WidgetBuilder> routes = {
-    main: (context) => MainPage(),
+    splash: (context) => SplashScreen(),
     homePage: (context) => HomePage(),
+    jobList: (context) => JobList(),
+
   };
 }
