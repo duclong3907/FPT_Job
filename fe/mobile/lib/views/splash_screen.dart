@@ -92,7 +92,7 @@ class SplashScreen extends StatelessWidget {
                 bottom: 100,
                 child: InkWell(
                   onTap: (){
-                    Navigator.pushNamed(context, '/home');
+                    Navigator.pushNamed(context, '/main');
                   },
                   child: Container(
                     height: 55,
