@@ -7,7 +7,7 @@ class User {
   String id;
   String userName;
   String email;
-  String passwordHash;
+  String password;
   String phoneNumber;
 
 
@@ -15,7 +15,7 @@ class User {
     required this.id,
     required this.userName,
     required this.email,
-    required this.passwordHash,
+    required this.password,
     required this.phoneNumber,
   });
 
