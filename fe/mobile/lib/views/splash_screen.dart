@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../view_models/auth_view_model.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final AuthViewModel authViewModel = Get.find<AuthViewModel>();
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -59,29 +63,48 @@ class SplashScreen extends StatelessWidget {
                       )
                     ]),
                     Row(children: [
-                      Container(
-                        height: 55,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          border: Border.all(width: 1, color: Colors.black26),
-                          color: Colors.white38,
-                          borderRadius: BorderRadius.circular(45),
+                      InkWell(
+                        onTap: () {
+                          if(authViewModel.isLoggedIn.value){
+                            Navigator.pushNamed(context, '/main');
+                          } else{
+                            Navigator.pushNamed(context, '/register');
+                          }
+                        },
+                        child: Container(
+                          height: 55,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 1, color: Colors.black26),
+                            color: Colors.white38,
+                            borderRadius: BorderRadius.circular(45),
+                          ),
+                          child: const Center(child: Text('Register')),
                         ),
-                        child: const Center(child: Text('Register')),
                       ),
                       const SizedBox(width: 10),
-                      Container(
-                        height: 55,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 110, 59, 228),
-                          borderRadius: BorderRadius.circular(45),
+                      InkWell(
+                        onTap: () {
+                          if(authViewModel.isLoggedIn.value){
+                            Navigator.pushNamed(context, '/main');
+                          } else{
+                            Navigator.pushNamed(context, '/login');
+                          }
+
+                        },
+                        child: Container(
+                          height: 55,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 110, 59, 228),
+                            borderRadius: BorderRadius.circular(45),
+                          ),
+                          child: const Center(
+                              child: Text(
+                            'Login',
+                            style: TextStyle(color: Colors.white),
+                          )),
                         ),
-                        child: const Center(
-                            child: Text(
-                          'Login',
-                          style: TextStyle(color: Colors.white),
-                        )),
                       ),
                     ]),
                   ],

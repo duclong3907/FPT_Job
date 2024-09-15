@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../config/config_html.dart';
 import '../models/job/job_model.dart';
 import '../utils/time_ago.dart';
+import '../view_models/auth_view_model.dart';
 import '../view_models/job_view_model.dart';
 
 class JobDetailScreen extends StatelessWidget {
@@ -76,6 +77,7 @@ class JobMeta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AuthViewModel authViewModel = Get.find<AuthViewModel>();
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -113,7 +115,11 @@ class JobMeta extends StatelessWidget {
             ),
             trailing: ElevatedButton(
               onPressed: () {
-                Get.snackbar('Apply', 'You have applied for this job');
+                if(authViewModel.isLoggedIn.value) {
+                  Get.snackbar('Success', 'Apply Successfully!');
+                } else {
+                  Get.snackbar('Warning', 'You must be logged in to apply for a job!');
+                }
               },
               child: const Text(
                 'Apply',

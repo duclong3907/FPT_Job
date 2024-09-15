@@ -11,19 +11,24 @@ class Header extends StatelessWidget {
           padding: const EdgeInsets.only(top: 30),
           child: Row(
             children: [
-              Container(
-                alignment: Alignment.centerRight,
-                width: 100,
-                height: 50,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(45),
-                    bottomRight: Radius.circular(45),
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, '/');
+                },
+                child: Container(
+                  alignment: Alignment.centerRight,
+                  width: 100,
+                  height: 50,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(45),
+                      bottomRight: Radius.circular(45),
+                    ),
+                    color: Color.fromARGB(255, 110, 59, 228),
                   ),
-                  color: Color.fromARGB(255, 110, 59, 228),
+                  child: const CircleAvatar(
+                      backgroundImage: AssetImage('assets/images/avatar.png')),
                 ),
-                child: const CircleAvatar(
-                    backgroundImage: AssetImage('assets/images/avatar.png')),
               ),
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

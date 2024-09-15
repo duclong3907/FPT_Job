@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'routes/routes.dart';
+import 'view_models/auth_view_model.dart';
+import 'view_models/user_view_model.dart';
 
-void main() => runApp(MainPage());
+void main() {
+  Get.put(AuthViewModel());
+  Get.put(UserViewModel());
+  runApp(MainPage());
+}
 
 class MainPage extends StatelessWidget {
   @override
@@ -11,7 +17,6 @@ class MainPage extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Job Finder',
         initialRoute: AppRoutes.splash,
-        routes: AppRoutes.routes
-    );
+        routes: AppRoutes.routes);
   }
 }

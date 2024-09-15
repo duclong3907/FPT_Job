@@ -16,6 +16,8 @@ dependencies:
   json_annotation: ^4.9.0
   get: ^4.6.6
   html: ^0.15.4
+  shared_preferences: ^2.3.2
+  dart_jsonwebtoken: ^2.14.0
 
 dev_dependencies:
   flutter_test:
