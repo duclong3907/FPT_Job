@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(width: 15),
                       Obx(() {
                         if (jobCategoryViewModel.isLoading.value) {
-                          return Center(child: CircularProgressIndicator());
+                          return Center(child: Text('Loading...'));
                         } else {
                           return DropdownButton<String>(
                             hint: Text(selectedCategoryName ?? 'All'),

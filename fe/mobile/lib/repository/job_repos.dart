@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../models/category/job_category_model.dart';
 import '../models/job/job_model.dart';
 import '../config/config_http.dart';
+import '../models/user/user_response_model.dart';
 
 class JobRepository {
   String baseUrl = 'https://192.168.1.5:5001/api';
@@ -47,7 +48,11 @@ class JobRepository {
 
         // Fetch JobCategory
         final categoryUrl = Uri.parse('$baseUrl/Categories/${job.jobCategoryId}');
+        //Fetch Employer
+        final employerUrl = Uri.parse('$baseUrl/User/${job.employerId}');
+
         print('Fetching job category from: $categoryUrl');
+        print('Fetching job employer from: $employerUrl');
         final categoryResponse = await http.get(categoryUrl, headers: {
           'Content-Type': 'application/json; charset=UTF-8',
         });
@@ -57,6 +62,18 @@ class JobRepository {
         } else {
           print('Failed to load job category: ${categoryResponse.statusCode}');
           throw Exception('Failed to load job category');
+        }
+
+        if(employerUrl != null){
+          final employerResponse = await http.get(employerUrl, headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          });
+          if (employerResponse.statusCode == 200) {
+            job.employer = UserResponse.fromJson(json.decode(employerResponse.body));
+          } else {
+            print('Failed to load employer: ${employerResponse.statusCode}');
+            throw Exception('Failed to load employer');
+          }
         }
 
         return job;
@@ -81,7 +98,7 @@ class JobRepository {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseBody = json.decode(response.body);
-        final List<dynamic> jobsJson = responseBody['jobs']; // Adjust this key based on your API response
+        final List<dynamic> jobsJson = responseBody['jobs'];
         final List<Job> jobs = jobsJson.map((dynamic item) => Job.fromJson(item)).toList();
         return jobs.where((job) => job.jobCategoryId == categoryId).toList();
       } else {

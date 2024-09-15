@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 String timeAgo(DateTime dateTime) {
   final Duration difference = DateTime.now().difference(dateTime);
 
@@ -10,4 +12,10 @@ String timeAgo(DateTime dateTime) {
   } else {
     return '${difference.inDays} days ago';
   }
+}
+
+String convertDate(String dateStr) {
+  DateTime dateTime = DateTime.parse(dateStr);
+  DateFormat formatter = DateFormat('dd/MM/yyyy');
+  return formatter.format(dateTime);
 }

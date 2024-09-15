@@ -30,7 +30,9 @@ Job _$JobFromJson(Map<String, dynamic> json) => Job(
       jobCategory: json['jobCategory'] == null
           ? null
           : JobCategory.fromJson(json['jobCategory'] as Map<String, dynamic>),
-    );
+    )..employer = json['employer'] == null
+        ? null
+        : UserResponse.fromJson(json['employer'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'id': instance.id,
@@ -49,4 +51,5 @@ Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'updated_At': instance.updatedAt?.toIso8601String(),
       'deleted': instance.deleted,
       'jobCategory': instance.jobCategory,
+      'employer': instance.employer,
     };

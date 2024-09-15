@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../config/config_html.dart';
@@ -88,15 +90,31 @@ class JobMeta extends StatelessWidget {
           const SizedBox(height: 16),
           ListTile(
             contentPadding: const EdgeInsets.all(0),
-            leading: const CircleAvatar(
+            leading: job!.employer?.image != null
+                ? CircleAvatar(
+              radius: 30, // Increase the radius to make it larger
+              backgroundImage: MemoryImage(
+                  base64Decode(
+                    job!.employer!.image!
+                        .replaceFirst('data:image/jpeg;base64,', ''),
+                  )
+              ),
+            )
+                : CircleAvatar(
+              radius: 30,
               child: Icon(Icons.person),
             ),
-            title: Text(job!.employerId),
+            title: Text(
+                job?.employer?.fullName != null && job!.employer!.fullName != ''
+                    ? job!.employer!.fullName
+                    : job?.employer?.user?.email ?? 'Unknown'),
             subtitle: Text(
               "${job!.updatedAt != null ? timeAgo(job!.updatedAt!) : 'Unknown date'}",
             ),
             trailing: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.snackbar('Apply', 'You have applied for this job');
+              },
               child: const Text(
                 'Apply',
                 style: TextStyle(color: Colors.white),
@@ -137,9 +155,42 @@ class JobContent extends StatelessWidget {
                 ),
           ),
           const SizedBox(height: 16),
+          Row(
+            children: [
+              Icon(Icons.alarm, size: 16, color: Colors.black),
+              const SizedBox(width: 6),
+              Text(
+                  'Deadline: ${DateFormat('dd/MM/yyyy').format(job!.applicationDeadline)}',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[600],
+                    fontSize: 20,)
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           Text(
+            textAlign: TextAlign.justify,
+              'Skill Requirement: ${job!.skillRequired}',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.grey[600],
+                fontSize: 20,)
+          ),
+          const SizedBox(height: 16),
+          Text('Salary: \$${job!.salaryRange} / Year',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.grey[600],
+              fontSize: 20,)
+          ),
+          const SizedBox(height: 16),
+
+          Text('Description', style: TextStyle(fontSize: 20)),
+          const SizedBox(height: 16),
+          Text(
+            textAlign: TextAlign.justify,
             stripHtmlTags(job!.description),
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.grey[600],
+              fontSize: 16,)
           ),
           const SizedBox(height: 16),
         ],
@@ -153,15 +204,14 @@ class JobTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
       child: Wrap(
-        // Wrap se tu dong chuyen dong khi het khong gian
-        spacing: 8, // khoang cach giua cac tag
+        spacing: 8,
         children: [
-          const Chip(label: Text('Science')), // tao 1 tag
-          const Chip(label: Text('Technology')),
-          const Chip(label: Text('Devices')),
+          Chip(label: Text('Science')),
+          Chip(label: Text('Technology')),
+          Chip(label: Text('Devices')),
         ],
       ),
     );

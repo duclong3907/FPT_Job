@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:mobile/models/user/user_response_model.dart';
 import '../category/job_category_model.dart';
 
 part 'job_model.g.dart';
@@ -29,6 +30,7 @@ class Job {
   DateTime? updatedAt;
   int? deleted;
   JobCategory? jobCategory;
+  UserResponse? employer;
 
   Job({
     required this.id,

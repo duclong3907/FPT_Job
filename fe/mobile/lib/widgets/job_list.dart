@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile/models/job/job_model.dart';
@@ -13,9 +15,9 @@ class JobList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      // if (jobViewModel.jobs.isEmpty) {
-      //   return Center(child: CircularProgressIndicator());
-      // }
+      if (jobViewModel.jobs.isEmpty) {
+        return Center(child: CircularProgressIndicator());
+      }
       return Expanded(
         child: ListView.builder(
           shrinkWrap: true,
@@ -33,7 +35,7 @@ class JobList extends StatelessWidget {
                   return itemCard(job: job);
                 }),
               ),
-            onTap: () => Get.to(() => JobDetailScreen(jobId: job.id)),
+              onTap: () => Get.to(() => JobDetailScreen(jobId: job.id)),
             );
           },
         ),
@@ -51,7 +53,7 @@ class itemCard extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          CardBanner(image: job.image??""),
+          CardBanner(image: job.image ?? ""),
           CardDetail(job: job),
         ],
       ),
@@ -111,22 +113,28 @@ class CardDetail extends StatelessWidget {
               Expanded(
                 child: Row(
                   children: [
-                    Icon(Icons.alarm, size: 16,),
+                    Icon(Icons.alarm, size: 16),
                     const SizedBox(width: 6),
-                    Text(
-                      job.updatedAt != null ? timeAgo(job.updatedAt!) : 'Unknown date',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Expanded(
+                      child: Text(
+                        job.updatedAt != null
+                            ? timeAgo(job.updatedAt!)
+                            : 'Unknown date',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
               ),
               Spacer(flex: 1),
               Icon(Icons.attach_money_outlined, size: 16),
-              Text(
-                '${job.salaryRange} / Year',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: Text(
+                  '${job.salaryRange} / Year',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           )
@@ -146,14 +154,19 @@ class CustomImageWidget extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: 200,
-      child: Image.network(
-        imagePath,
-        fit: BoxFit.cover,
-        loadingBuilder: (context, child, progress) {
-          if (progress == null) return child;
-          return Center(child: const CircularProgressIndicator());
-        },
-      ),
+      child: imagePath.startsWith('data:image')
+          ? Image.memory(
+              base64Decode(imagePath.split(',').last),
+              fit: BoxFit.cover,
+            )
+          : Image.network(
+              imagePath,
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, progress) {
+                if (progress == null) return child;
+                return Center(child: const CircularProgressIndicator());
+              },
+            ),
     );
   }
 }
