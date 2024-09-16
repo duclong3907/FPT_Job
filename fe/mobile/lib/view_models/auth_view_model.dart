@@ -2,6 +2,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../repository/auth_repos.dart';
+import 'job_view_model.dart';
 
 class AuthViewModel extends GetxController {
   var token = ''.obs;
@@ -32,6 +33,9 @@ class AuthViewModel extends GetxController {
           prefs.setString('role', jwt.payload['Role']);
         });
         isLoggedIn.value = true;
+        // Refresh favorite jobs after login
+        final JobViewModel jobViewModel = Get.find<JobViewModel>();
+        await jobViewModel.login(this.userId.value);
       } else {
         isLoggedIn.value = false;
         Get.snackbar('Error', 'token is null');

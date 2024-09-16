@@ -16,51 +16,48 @@ class JobDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final JobViewModel jobViewModel = Get.find();
+    final JobViewModel jobViewModel = Get.find<JobViewModel>();
+
+    //tranh loi setState() hoặc markNeedsBuild() called during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      jobViewModel.fetchJobById(jobId);
+    });
 
     return Scaffold(
-      body: FutureBuilder(
-        future: jobViewModel.fetchJobById(jobId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            final job = jobViewModel.selectedJob.value;
-            if (job == null) {
-              return Center(child: Text('Job not found'));
-            }
-            return CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  expandedHeight: 300,
-                  pinned: true,
-                  floating: true,
-                  elevation: 50,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: CustomImageWidget(imagePath: job.image!),
-                  ),
+      body: Obx(() {
+        if (jobViewModel.selectedJob.value == null) {
+          return Center(child: Text('Job not found.'));
+        } else {
+          final job = jobViewModel.selectedJob.value!;
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 300,
+                pinned: true,
+                floating: true,
+                elevation: 50,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: CustomImageWidget(imagePath: job.image!),
                 ),
-                SliverList(
-                  delegate: SliverChildListDelegate(
-                    [
-                      JobMeta(job: job),
-                      JobContent(job: job),
-                      const JobTags(),
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 16),
-                        height: 16,
-                        color: Colors.grey[300],
-                      ),
-                    ],
-                  ),
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate(
+                  [
+                    JobMeta(job: job),
+                    JobContent(job: job),
+                    const JobTags(),
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 16),
+                      height: 16,
+                      color: Colors.grey[300],
+                    ),
+                  ],
                 ),
-              ],
-            );
-          }
-        },
-      ),
+              ),
+            ],
+          );
+        }
+      }),
     );
   }
 }

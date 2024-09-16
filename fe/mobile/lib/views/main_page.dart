@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../view_models/auth_view_model.dart';
+import 'favorite_job_screen.dart';
 import 'home_screen.dart';
 import 'profile_page.dart';
 
@@ -27,6 +28,7 @@ class _MainScreenState extends State<MainScreen> {
                 index: isLoggedIn ? index : 0,
                 children: [
                   const HomePage(),
+                  if (isLoggedIn) FavoriteJobsPage(),
                   if (isLoggedIn) ProfilePage(),
                 ],
               );
@@ -48,6 +50,10 @@ class _MainScreenState extends State<MainScreen> {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home),
                   label: 'Home',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.list_alt_outlined),
+                  label: 'List',
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.person),

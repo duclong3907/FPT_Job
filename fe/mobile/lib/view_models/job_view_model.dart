@@ -8,6 +8,8 @@ class JobViewModel extends GetxController {
   var isLoading = false.obs;
   var allJobs = <Job>[].obs;
   var selectedJob = Rxn<Job>();
+  var userId = ''.obs;
+  var favoriteJobIds = <int>[].obs;
 
   JobViewModel({required this.jobRepository});
 
@@ -36,7 +38,8 @@ class JobViewModel extends GetxController {
       isLoading.value = true;
       selectedJob.value = await jobRepository.fetchJobById(id);
     } catch (e) {
-      Get.snackbar('Error', '$e');
+      print(e);
+      Get.snackbar('Title', 'Message');
     } finally {
       isLoading.value = false;
     }
@@ -65,4 +68,46 @@ class JobViewModel extends GetxController {
       isLoading.value = false;
     }
   }
+
+  // void toggleFavorite(Job job, String userId) async {
+  //   this.userId.value = userId;
+  //   job.isFavorite = !job.isFavorite;
+  //   jobs.refresh();
+  //   await jobRepository.saveFavorites(jobs, userId);
+  // }
+  //
+  // Future<void> loadFavorites() async {
+  //   print(this.userId.value);
+  //   await jobRepository.loadFavorites(jobs, this.userId.value);
+  //   jobs.refresh();
+  // }
+
+
+  void toggleFavorite(Job job, String userId) async {
+    this.userId.value = userId;
+    if (favoriteJobIds.contains(job.id)) {
+      favoriteJobIds.remove(job.id);
+      await jobRepository.deleteFavorite(job.id, userId);
+    } else {
+      favoriteJobIds.add(job.id);
+      await jobRepository.insertFavorite(job.id, userId);
+    }
+    jobs.refresh();
+  }
+
+  Future<void> loadFavorites(String userId) async {
+    this.userId.value = userId;
+    favoriteJobIds.assignAll(await jobRepository.getFavorites(userId));
+    jobs.refresh();
+  }
+
+  bool isFavorite(Job job) {
+    return favoriteJobIds.contains(job.id);
+  }
+
+  Future<void> login(String userId) async {
+    this.userId.value = userId;
+    await loadFavorites(userId);
+  }
+
 }

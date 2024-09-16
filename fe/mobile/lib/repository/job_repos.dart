@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/category/job_category_model.dart';
 import '../models/job/job_model.dart';
 import '../config/config_http.dart';
 import '../models/user/user_response_model.dart';
+import '../config/database_helper.dart';
 
 class JobRepository {
   String baseUrl = baseUrlApi;
+  final DatabaseHelper _dbHelper = DatabaseHelper();
 
   Future<List<Job>> fetchJobs() async {
     try {
@@ -104,5 +107,32 @@ class JobRepository {
     }
   }
 
+  // Future<void> saveFavorites(List<Job> jobs, String userId) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final favoriteJobs = jobs.where((job) => job.isFavorite).map((job) => job.id).toList();
+  //   await prefs.setStringList('favoriteJobs_$userId', favoriteJobs.map((id) => id.toString()).toList());
+  // }
+  //
+  // Future<void> loadFavorites(List<Job> jobs, String userId) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final favoriteJobIds = prefs.getStringList('favoriteJobs_$userId')?.map((id) => int.parse(id)).toList() ?? [];
+  //   for (var job in jobs) {
+  //     if (favoriteJobIds.contains(job.id)) {
+  //       job.isFavorite = true;
+  //     }
+  //   }
+  // }
+
+  Future<void> insertFavorite(int jobId, String userId) async {
+    await _dbHelper.insertFavorite(jobId, userId);
+  }
+
+  Future<void> deleteFavorite(int jobId, String userId) async {
+    await _dbHelper.deleteFavorite(jobId, userId);
+  }
+
+  Future<List<int>> getFavorites(String userId) async {
+    return await _dbHelper.getFavorites(userId);
+  }
 
 }

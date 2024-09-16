@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile/models/job/job_model.dart';
 import '../utils/time_ago.dart';
+import '../view_models/auth_view_model.dart';
 import '../view_models/job_view_model.dart';
 import '../views/job_detail_screen.dart';
 import 'custom_image_widget.dart';
 
 class JobList extends StatelessWidget {
-  // final jobViewModel = Get.put(JobViewModel(jobRepository: JobRepository()));
   final jobViewModel = Get.find<JobViewModel>();
 
   @override
@@ -33,7 +33,10 @@ class JobList extends StatelessWidget {
                   return itemCard(job: job);
                 }),
               ),
-              onTap: () => Get.to(() => JobDetailScreen(jobId: job.id)),
+              onTap: () {
+                print('Job tapped: ${job.title}');
+                Get.to(() => JobDetailScreen(jobId: job.id));
+              },
             );
           },
         ),
@@ -51,7 +54,7 @@ class itemCard extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          CardBanner(image: job.image ?? ""),
+          CardBanner(image: job.image ?? "", job: job),
           CardDetail(job: job),
         ],
       ),
@@ -60,10 +63,13 @@ class itemCard extends StatelessWidget {
 }
 
 class CardBanner extends StatelessWidget {
-  const CardBanner({super.key, required this.image});
+  const CardBanner({super.key, required this.image, required this.job});
   final String image;
+  final Job job;
   @override
   Widget build(BuildContext context) {
+    final jobViewModel = Get.find<JobViewModel>();
+    final AuthViewModel authViewModel = Get.find<AuthViewModel>();
     return Stack(
       children: [
         ClipRRect(
@@ -77,7 +83,10 @@ class CardBanner extends StatelessWidget {
           top: 0,
           right: 0,
           child: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              jobViewModel.toggleFavorite(job, authViewModel.userId.value);
+              Get.snackbar('Alert', "Favorite added");
+            },
             icon: Icon(Icons.bookmark_border),
           ),
         )
