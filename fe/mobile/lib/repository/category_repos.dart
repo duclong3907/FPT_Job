@@ -5,7 +5,7 @@ import '../config/config_http.dart';
 import '../models/category/job_category_model.dart';
 
 class JobCategoryRepository {
-  final String apiUrl = "https://192.168.1.5:5001/api/Categories";
+  final String apiUrl = "$baseUrlApi/Categories";
 
   Future<List<JobCategory>> fetchJobCategories() async {
     final response = await http.get(Uri.parse(apiUrl));

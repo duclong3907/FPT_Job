@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -43,6 +41,19 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  final ImagePicker _picker = ImagePicker();
+
+  void selectImage() async {
+    final XFile? img = await _picker.pickImage(source: ImageSource.gallery);
+    if (img != null) {
+      final imageBytes = await img.readAsBytes();
+      final encodedImage = base64Encode(imageBytes);
+      setState(() {
+        user!.image = 'data:image/png;base64,$encodedImage';
+      });
+    }
+  }
+
   @override
   void dispose() {
     fullNameController.dispose();
@@ -56,19 +67,16 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
+        title: const Text('Profile'),
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
-            onPressed: () {
-              authViewModel.logout();
-              Get.offNamed('/');
-            },
+            onPressed: btnLogout,
           ),
         ],
       ),
       body: user == null
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
@@ -87,16 +95,20 @@ class _ProfilePageState extends State<ProfilePage> {
                                           base64Decode(
                                               user!.image!.split(',').last),
                                           fit: BoxFit.cover,
+                                          width: 160,
+                                          height: 160,
                                         )
                                       : Image.network(
                                           user!.image!,
                                           fit: BoxFit.cover,
+                                          width: 160,
+                                          height: 160,
                                           loadingBuilder:
                                               (context, child, progress) {
                                             if (progress == null) return child;
-                                            return Center(
+                                            return const Center(
                                               child:
-                                                  const CircularProgressIndicator(),
+                                                  CircularProgressIndicator(),
                                             );
                                           },
                                         ))
@@ -112,8 +124,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             bottom: 0,
                             right: 0,
                             child: InkWell(
-                              onTap: () {},
-                              child: CircleAvatar(
+                              onTap: selectImage,
+                              child: const CircleAvatar(
                                 backgroundColor: Colors.white,
                                 radius: 20,
                                 child: Icon(Icons.camera_alt),
@@ -122,26 +134,29 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 12),
-                      Text(user!.roles.join() ?? '', style: TextStyle(fontSize: 20),),
+                      const SizedBox(height: 12),
+                      Text(
+                        user!.roles.join() ?? '',
+                        style: const TextStyle(fontSize: 20),
+                      ),
                       TextFormField(
                         controller: fullNameController,
-                        decoration: InputDecoration(labelText: 'Full Name'),
+                        decoration: const InputDecoration(labelText: 'Full Name'),
                       ),
                       TextFormField(
                         controller: emailController,
-                        decoration: InputDecoration(labelText: 'Email'),
+                        decoration: const InputDecoration(labelText: 'Email'),
                       ),
                       TextFormField(
                         controller: phoneNumberController,
-                        decoration: InputDecoration(labelText: 'Phone Number'),
+                        decoration: const InputDecoration(labelText: 'Phone Number'),
                       ),
                       TextFormField(
                         controller: passwordController,
-                        decoration: InputDecoration(labelText: 'Password'),
+                        decoration: const InputDecoration(labelText: 'Password'),
                         obscureText: true,
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () async {
                           if (_formKey.currentState?.validate() ?? false) {
@@ -158,13 +173,40 @@ class _ProfilePageState extends State<ProfilePage> {
                             }
                           }
                         },
-                        child: Text('Update Profile'),
+                        child: const Text('Update Profile'),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
+    );
+  }
+
+  void btnLogout() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                authViewModel.logout();
+                Get.offNamed('/');
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

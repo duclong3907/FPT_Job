@@ -1,5 +1,7 @@
 import 'dart:io';
 
+const String baseUrlApi = 'https://192.168.1.3:5001/api';
+
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -7,3 +9,4 @@ class MyHttpOverrides extends HttpOverrides {
       ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
+

@@ -6,7 +6,7 @@ import '../config/config_http.dart';
 import '../models/user/user_response_model.dart';
 
 class UserRepository {
-  final String baseUrl = 'https://192.168.1.5:5001/api';
+  final String baseUrl = baseUrlApi;
 
   Future<List<UserResponse>> fetchUsers() async {
     HttpOverrides.global = MyHttpOverrides();

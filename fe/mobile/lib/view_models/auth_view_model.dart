@@ -40,31 +40,6 @@ class AuthViewModel extends GetxController {
     }
   }
 
-  // Future<void> login(String userName, String password) async {
-  //   try {
-  //     final token = await _authService.login(userName, password);
-  //     if (token != null) {
-  //       this.token.value = token;
-  //       print('Token: $token');
-  //
-  //       // Decode the token to extract userId
-  //       final jwt = JWT.decode(token);
-  //       print('UserId: ${jwt.payload['userId']}');
-  //
-  //       await SharedPreferences.getInstance().then((prefs) {
-  //         prefs.setString('token', token);
-  //         prefs.setString('userId', jwt.payload['userId']);
-  //       });
-  //
-  //       isLoggedIn.value = true;
-  //     } else {
-  //       isLoggedIn.value = false;
-  //     }
-  //   } catch (e) {
-  //     print('Error logging in: $e');
-  //     isLoggedIn.value = false;
-  //   }
-  // }
 
   void checkLogin() async {
     final token = await _authService.getToken();

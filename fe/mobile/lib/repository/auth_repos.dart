@@ -5,10 +5,10 @@ import '../config/config_http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  final String baseUrl = 'https://192.168.1.5:5001/api/Auth';
+  final String apiUrl = '$baseUrlApi/Auth';
 
   Future<String?> login(String userName, String password) async {
-    final url = Uri.parse('$baseUrl/Login');
+    final url = Uri.parse('$apiUrl/Login');
     HttpOverrides.global = MyHttpOverrides();
     print('Sending POST request to $url with username: $userName');
 
@@ -46,7 +46,7 @@ class AuthService {
     final token = prefs.getString('token');
 
     if (token != null) {
-      final url = Uri.parse('$baseUrl/logout');
+      final url = Uri.parse('$apiUrl/logout');
       final response = await http.post(
         url,
         headers: {

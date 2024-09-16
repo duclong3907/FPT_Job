@@ -7,7 +7,7 @@ import '../config/config_http.dart';
 import '../models/user/user_response_model.dart';
 
 class JobRepository {
-  String baseUrl = 'https://192.168.1.5:5001/api';
+  String baseUrl = baseUrlApi;
 
   Future<List<Job>> fetchJobs() async {
     try {
