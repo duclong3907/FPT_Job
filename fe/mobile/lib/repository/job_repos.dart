@@ -35,7 +35,6 @@ class JobRepository {
   Future<Job> fetchJobById(int id) async {
     try {
       final url = Uri.parse('$baseUrl/Job/$id');
-      print('Fetching job from: $url');
 
       HttpOverrides.global = MyHttpOverrides();
       final response = await http.get(url, headers: {

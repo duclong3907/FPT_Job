@@ -23,7 +23,7 @@ const JobModal = ({ AddJob, categories, ModifyJob, job, employers, id }) => {
   let jobStatus = status ? "open" : "closed";
 
   const ToggleJobModal = async () => {
-    const salary = "$ " + salaryRange.toString();
+    const salary = salaryRange;
     const jobDate = new Date(selectedDate).toISOString();
     if (isRangeEnabled) {
       setSalaryRange("Discuss during interview");
@@ -294,7 +294,7 @@ const JobModal = ({ AddJob, categories, ModifyJob, job, employers, id }) => {
           disabled={isRangeEnabled}
           onChange={(e) => setSalaryRange(e.target.value)}
         />
-        <p>Salary: ${salaryRange}</p>
+        <p>Salary: {salaryRange}</p>
       </div>
 
       <div className="form-floating mb-3">

@@ -8,6 +8,7 @@ import '../utils/time_ago.dart';
 import '../view_models/application_view_model.dart';
 import '../view_models/auth_view_model.dart';
 import '../view_models/job_view_model.dart';
+import '../widgets/custom_image_widget.dart';
 
 class JobDetailScreen extends StatelessWidget {
   final int jobId;
@@ -38,10 +39,7 @@ class JobDetailScreen extends StatelessWidget {
                   floating: true,
                   elevation: 50,
                   flexibleSpace: FlexibleSpaceBar(
-                    background: Image.network(
-                      '${job.image}',
-                      fit: BoxFit.cover,
-                    ),
+                    background: CustomImageWidget(imagePath: job.image!),
                   ),
                 ),
                 SliverList(

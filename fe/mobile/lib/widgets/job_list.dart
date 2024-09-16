@@ -1,12 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile/models/job/job_model.dart';
-import '../repository/job_repos.dart';
 import '../utils/time_ago.dart';
 import '../view_models/job_view_model.dart';
 import '../views/job_detail_screen.dart';
+import 'custom_image_widget.dart';
 
 class JobList extends StatelessWidget {
   // final jobViewModel = Get.put(JobViewModel(jobRepository: JobRepository()));
@@ -144,29 +142,4 @@ class CardDetail extends StatelessWidget {
   }
 }
 
-class CustomImageWidget extends StatelessWidget {
-  final String imagePath;
 
-  CustomImageWidget({required this.imagePath});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 200,
-      child: imagePath.startsWith('data:image')
-          ? Image.memory(
-              base64Decode(imagePath.split(',').last),
-              fit: BoxFit.cover,
-            )
-          : Image.network(
-              imagePath,
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, progress) {
-                if (progress == null) return child;
-                return Center(child: const CircularProgressIndicator());
-              },
-            ),
-    );
-  }
-}
