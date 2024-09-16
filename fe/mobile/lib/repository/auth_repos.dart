@@ -10,7 +10,6 @@ class AuthService {
   Future<String?> login(String userName, String password) async {
     final url = Uri.parse('$apiUrl/Login');
     HttpOverrides.global = MyHttpOverrides();
-    print('Sending POST request to $url with username: $userName');
 
     final response = await http.post(
       url,
@@ -18,25 +17,22 @@ class AuthService {
       body: jsonEncode({'username': userName, 'password': password}),
     );
 
-    print('Response received: ${response.statusCode} ${response.body}');
-
     try {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final token = data['token'];
-        print('Login successful, token: $token');
+
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
-        print('Token saved to SharedPreferences');
+
 
         return token;
       } else {
-        print('Failed to login, status code: ${response.statusCode}');
-        throw Exception('Failed to login');
+        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        throw Exception(errorResponse["message"]);
       }
     } catch (e) {
-      print('Error logging in: $e');
       throw Exception('Error logging in: $e');
     }
   }
@@ -58,7 +54,8 @@ class AuthService {
       if (response.statusCode == 200) {
         await prefs.remove('token');
       } else {
-        throw Exception('Failed to logout');
+        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        throw Exception(errorResponse["message"]);
       }
     }
     return true;

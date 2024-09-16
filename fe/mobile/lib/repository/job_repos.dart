@@ -12,7 +12,6 @@ class JobRepository {
   Future<List<Job>> fetchJobs() async {
     try {
       final url = Uri.parse('$baseUrl/Job');
-      print('Fetching jobs from: $url');
       HttpOverrides.global = MyHttpOverrides();
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json; charset=UTF-8',
@@ -25,10 +24,11 @@ class JobRepository {
         List<Job> jobs = jobsJson.map((dynamic item) => Job.fromJson(item)).toList();
         return jobs;
       } else {
-        throw Exception('Failed to load jobs');
+        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        throw Exception(errorResponse["message"]);
       }
     } catch (e) {
-      throw Exception('Error fetching jobs');
+      throw Exception('Error fetching jobs: $e');
     }
   }
 
@@ -51,8 +51,6 @@ class JobRepository {
         //Fetch Employer
         final employerUrl = Uri.parse('$baseUrl/User/${job.employerId}');
 
-        print('Fetching job category from: $categoryUrl');
-        print('Fetching job employer from: $employerUrl');
         final categoryResponse = await http.get(categoryUrl, headers: {
           'Content-Type': 'application/json; charset=UTF-8',
         });
@@ -60,7 +58,6 @@ class JobRepository {
         if (categoryResponse.statusCode == 200) {
           job.jobCategory = JobCategory.fromJson(json.decode(categoryResponse.body));
         } else {
-          print('Failed to load job category: ${categoryResponse.statusCode}');
           throw Exception('Failed to load job category');
         }
 
@@ -71,18 +68,17 @@ class JobRepository {
           if (employerResponse.statusCode == 200) {
             job.employer = UserResponse.fromJson(json.decode(employerResponse.body));
           } else {
-            print('Failed to load employer: ${employerResponse.statusCode}');
-            throw Exception('Failed to load employer');
+            final Map<String, dynamic> errorResponse = json.decode(response.body);
+            throw Exception(errorResponse["message"]);
           }
         }
 
         return job;
       } else {
-        print('Failed to load job: ${response.statusCode}');
-        throw Exception('Failed to load job: ${response.statusCode}');
+        final Map<String, dynamic> errorResponse = json.decode(response.body);
+        throw Exception(errorResponse["message"]);
       }
     } catch (e) {
-      print('Error fetching job: $e');
       throw Exception('Error fetching job: $e');
     }
   }

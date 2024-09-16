@@ -25,7 +25,7 @@ class JobViewModel extends GetxController {
       jobs.assignAll(jobList);
       allJobs.assignAll(jobList); // Populate allJobs
     } catch (e) {
-      Get.snackbar('Error fetching jobs', e.toString());
+      Get.snackbar('Error', '$e');
     } finally {
       isLoading.value = false;
     }
@@ -36,7 +36,7 @@ class JobViewModel extends GetxController {
       isLoading.value = true;
       selectedJob.value = await jobRepository.fetchJobById(id);
     } catch (e) {
-      print('Error fetching job: $e');
+      Get.snackbar('Error', '$e');
     } finally {
       isLoading.value = false;
     }
@@ -60,8 +60,7 @@ class JobViewModel extends GetxController {
       jobs.assignAll(jobList);
       allJobs.assignAll(jobList);
     } catch (e) {
-      print('Error fetching jobs by category: $e');
-      Get.snackbar('Error fetching jobs by category name', e.toString());
+      Get.snackbar('Error', '$e');
     } finally {
       isLoading.value = false;
     }

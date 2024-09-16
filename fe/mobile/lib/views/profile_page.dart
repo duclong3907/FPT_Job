@@ -167,6 +167,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 'email': emailController.text,
                                 'phoneNumber': phoneNumberController.text,
                                 'role': user!.roles.join(),
+                                'image': user!.image!,
                                 if (passwordController.text.isNotEmpty)
                                   'password': passwordController.text,
                               });

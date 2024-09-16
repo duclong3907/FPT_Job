@@ -21,9 +21,11 @@ class JobCategoryViewModel extends GetxController {
       var categories = await jobCategoryRepository.fetchJobCategories();
       if (categories != null) {
         jobCategories.assignAll(categories);
-        print('Fetched categories: $categories'); // In ra danh sách categories
       }
-    } finally {
+    } catch (e) {
+      Get.snackbar('Error', '$e');
+    }
+    finally {
       isLoading(false);
     }
   }

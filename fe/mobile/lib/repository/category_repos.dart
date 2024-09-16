@@ -11,9 +11,8 @@ class JobCategoryRepository {
     final response = await http.get(Uri.parse(apiUrl));
     HttpOverrides.global = MyHttpOverrides();
     if (response.statusCode == 200) {
-      print('Response body: ${response.body}'); // Print the response body for debugging
       Map<String, dynamic> body = json.decode(response.body);
-      List<dynamic> categoriesJson = body['jobCategories']; // Use the correct key 'jobCategories'
+      List<dynamic> categoriesJson = body['jobCategories'];
       if (categoriesJson == null) {
         throw Exception('Categories not found in the response');
       }
@@ -24,7 +23,8 @@ class JobCategoryRepository {
           .toList();
       return jobCategories;
     } else {
-      throw Exception('Failed to load job categories');
+      final Map<String, dynamic> errorResponse = json.decode(response.body);
+      throw Exception(errorResponse["message"]);
     }
   }
 

@@ -7,6 +7,7 @@ class User {
   String id;
   String userName;
   String email;
+  @JsonKey(name: 'passwordHash')
   String password;
   String phoneNumber;
 

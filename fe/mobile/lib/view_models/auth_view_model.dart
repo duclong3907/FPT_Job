@@ -7,6 +7,7 @@ class AuthViewModel extends GetxController {
   var token = ''.obs;
   var isLoggedIn = false.obs;
   var userId = ''.obs;
+  var role = ''.obs;
   var isLoading = false.obs;
   final AuthService _authService = AuthService();
 
@@ -24,10 +25,11 @@ class AuthViewModel extends GetxController {
         final jwt = JWT.decode(token);
         print('UserId: ${jwt.payload['UserId']}');
         this.userId.value = jwt.payload['UserId'];
-        //
+        this.role.value = jwt.payload['Role'];
         await SharedPreferences.getInstance().then((prefs) {
           prefs.setString('token', token);
           prefs.setString('userId', jwt.payload['UserId']);
+          prefs.setString('role', jwt.payload['Role']);
         });
         isLoggedIn.value = true;
       } else {
@@ -36,7 +38,7 @@ class AuthViewModel extends GetxController {
       }
     } catch (e) {
       isLoggedIn.value = false;
-      print('Error logging in: $e');
+      Get.snackbar('Error', '$e');
     }
   }
 
@@ -58,13 +60,15 @@ class AuthViewModel extends GetxController {
         await SharedPreferences.getInstance().then((prefs) {
           prefs.remove('token');
           prefs.remove('userId');
+          prefs.remove('role');
         });
         isLoggedIn.value = false;
         this.token.value = '';
         userId.value = '';
+        role.value = '';
       }
     } catch (e) {
-      print('Error logging out: $e');
+      Get.snackbar('Error', '$e');
     }
   }
 }

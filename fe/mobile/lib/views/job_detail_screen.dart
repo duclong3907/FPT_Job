@@ -5,12 +5,12 @@ import 'package:get/get.dart';
 import '../config/config_html.dart';
 import '../models/job/job_model.dart';
 import '../utils/time_ago.dart';
+import '../view_models/application_view_model.dart';
 import '../view_models/auth_view_model.dart';
 import '../view_models/job_view_model.dart';
 
 class JobDetailScreen extends StatelessWidget {
   final int jobId;
-
   JobDetailScreen({required this.jobId});
 
   @override
@@ -116,7 +116,13 @@ class JobMeta extends StatelessWidget {
             trailing: ElevatedButton(
               onPressed: () {
                 if(authViewModel.isLoggedIn.value) {
-                  Get.snackbar('Success', 'Apply Successfully!');
+                  if(authViewModel.role.value == 'Admin') {
+                    Get.snackbar('Warning', 'Admin cannot apply for a job!');
+                  } else if(authViewModel.role.value == 'Employer') {
+                    Get.snackbar('Warning', 'Employer cannot apply for a job!');
+                  } else{
+                    _showAddApplicationDialog(context);
+                  }
                 } else {
                   Get.snackbar('Warning', 'You must be logged in to apply for a job!');
                 }
@@ -135,6 +141,92 @@ class JobMeta extends StatelessWidget {
       ),
     );
   }
+
+  void _showAddApplicationDialog(BuildContext context) {
+    final _formKey = GlobalKey<FormState>();
+    final TextEditingController _resumeController = TextEditingController();
+    final TextEditingController _coverLetterController = TextEditingController();
+    final TextEditingController _selfIntroductionController = TextEditingController();
+    final TextEditingController _jobIdController = TextEditingController();
+    final AuthViewModel authViewModel = Get.find<AuthViewModel>();
+    final ApplicationViewModel _applicationViewModel = Get.find<ApplicationViewModel>();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add Application'),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _resumeController,
+                  decoration: InputDecoration(labelText: 'Resume'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter resume';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _coverLetterController,
+                  decoration: InputDecoration(labelText: 'Cover Letter'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter cover letter';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _selfIntroductionController,
+                  decoration: InputDecoration(labelText: 'Self Introduction'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter self introduction';
+                    }
+                    return null;
+                  },
+                ),
+
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  Map<String, String> applicationData = {
+                    'resume': _resumeController.text,
+                    'coverLetter': _coverLetterController.text,
+                    'selfIntroduction': _selfIntroductionController.text,
+                    'status': 'pending', // Default status
+                    'jobId': job!.id.toString(),
+                    'userId': authViewModel.userId.value,
+                  };
+
+                  _applicationViewModel.addApplication(applicationData);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
 
 class JobContent extends StatelessWidget {
