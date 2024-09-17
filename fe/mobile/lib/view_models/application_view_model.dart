@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../models/application/application_model.dart';
 import '../repository/application_repos.dart';
+import '../utils/snackbar_get.dart';
 import 'auth_view_model.dart';
 
 class ApplicationViewModel extends GetxController {
@@ -27,17 +28,17 @@ class ApplicationViewModel extends GetxController {
       applications.value = result;
     } catch (e) {
       print('Error fetching applications: $e');
-      Get.snackbar('Error', '$e');
+      SnackbarUtils.showErrorSnackbar('$e');
     }
   }
 
   Future<void> addApplication(Map<String, String> requestBody) async {
     try {
       await _applicationRepository.addApplication(requestBody);
-      Get.snackbar('Alert', 'Apply successfully');
+      SnackbarUtils.showSuccessSnackbar('You applied successfully!');
     } catch (e) {
       print('Error adding application: $e');
-      Get.snackbar('Error', '$e');
+      SnackbarUtils.showErrorSnackbar('$e');
     }
   }
 
@@ -52,6 +53,7 @@ class ApplicationViewModel extends GetxController {
       print('User applied job IDs: ${userAppliedJobIds.value}');
     } catch (e) {
       print('Error fetching user applications: $e');
+      SnackbarUtils.showErrorSnackbar('$e');
     } finally {
       isLoading.value = false;
     }
@@ -64,7 +66,7 @@ class ApplicationViewModel extends GetxController {
       jobApplications.assignAll(applications);
     } catch (e) {
       print(e);
-      Get.snackbar('Error', '$e');
+      SnackbarUtils.showErrorSnackbar('$e');
     } finally {
       isLoading.value = false;
     }

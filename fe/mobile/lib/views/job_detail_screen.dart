@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../config/config_html.dart';
 import '../models/job/job_model.dart';
+import '../utils/snackbar_get.dart';
 import '../utils/time_ago.dart';
 import '../view_models/application_view_model.dart';
 import '../view_models/auth_view_model.dart';
@@ -115,14 +116,17 @@ class JobMeta extends StatelessWidget {
               onPressed: () {
                 if(authViewModel.isLoggedIn.value) {
                   if(authViewModel.role.value == 'Admin') {
-                    Get.snackbar('Warning', 'Admin cannot apply for a job!');
+                    SnackbarUtils.showWarningSnackbar(
+                        'Admin cannot apply for a job!');
                   } else if(authViewModel.role.value == 'Employer') {
-                    Get.snackbar('Warning', 'Employer cannot apply for a job!');
+                    SnackbarUtils.showWarningSnackbar(
+                        'Employer cannot apply for a job!');
                   } else{
                     _showAddApplicationDialog(context);
                   }
                 } else {
-                  Get.snackbar('Warning', 'You must be logged in to apply for a job!');
+                  SnackbarUtils.showWarningSnackbar(
+                      'You must be logged in to apply for a job!');
                 }
               },
               child: const Text(

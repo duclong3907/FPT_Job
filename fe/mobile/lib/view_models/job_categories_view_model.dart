@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../models/category/job_category_model.dart';
 import '../repository/category_repos.dart';
+import '../utils/snackbar_get.dart';
 
 class JobCategoryViewModel extends GetxController {
   var jobCategories = <JobCategory>[].obs;
@@ -23,7 +24,7 @@ class JobCategoryViewModel extends GetxController {
         jobCategories.assignAll(categories);
       }
     } catch (e) {
-      Get.snackbar('Error', '$e');
+      SnackbarUtils.showErrorSnackbar('$e');
     }
     finally {
       isLoading(false);

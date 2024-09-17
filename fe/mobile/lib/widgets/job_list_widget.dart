@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile/view_models/auth_view_model.dart';
 import '../models/job/job_model.dart';
+import '../utils/snackbar_get.dart';
 import '../utils/time_ago.dart';
 import '../view_models/job_view_model.dart';
 import '../views/job_application_screen.dart';
@@ -84,7 +85,8 @@ class CardBanner extends StatelessWidget {
           child: IconButton(
             onPressed: () {
               jobViewModel.toggleFavorite(job);
-              Get.snackbar('Alert', "Favorite status changed");
+              SnackbarUtils.showSuccessSnackbar(
+                  'Favorite status changed');
             },
             icon: Icon(Icons.bookmark_border),
           ),

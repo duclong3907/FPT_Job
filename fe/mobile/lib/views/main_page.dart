@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../utils/snackbar_get.dart';
 import '../view_models/auth_view_model.dart';
 import 'favorite_job_screen.dart';
 import 'home_screen.dart';
@@ -41,7 +42,8 @@ class _MainScreenState extends State<MainScreen> {
               currentIndex: index,
               onTap: (value) {
                 if (value == 1 && !authViewModel.isLoggedIn.value) {
-                  Get.snackbar('Warning', 'You must be logged in to access this screen!');
+                  SnackbarUtils.showWarningSnackbar(
+                      'You must be logged in to access this screen!');
                 } else {
                   _currentIndex.value = value;
                 }

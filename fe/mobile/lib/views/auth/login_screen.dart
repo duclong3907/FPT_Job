@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile/view_models/auth_view_model.dart';
 
+import '../../utils/snackbar_get.dart';
+
 class LoginScreen extends StatelessWidget {
   final AuthViewModel authViewModel = Get.put(AuthViewModel());
 
@@ -21,10 +23,11 @@ class LoginScreen extends StatelessWidget {
       if (token != null && token.isNotEmpty) {
         Get.offNamed('/main');
       } else {
-        Get.snackbar('warning', 'Invalid token');
+        SnackbarUtils.showWarningSnackbar('Invalid token');
+
       }
     } else {
-      Get.snackbar('Error', 'Login failed');
+      SnackbarUtils.showErrorSnackbar('Login failed');
     }
   }
 
@@ -39,7 +42,7 @@ class LoginScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // _buildLogo(),
+                _buildLogo(),
                 const SizedBox(height: 32),
                 _buildEmailPasswordSignIn(),
                 const SizedBox(height: 16),
@@ -59,7 +62,7 @@ class LoginScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Image.asset(
-          'assets/images/',
+          'assets/images/techjobs_logo.png',
           height: 80,
           fit: BoxFit.cover,
           filterQuality: FilterQuality.high,

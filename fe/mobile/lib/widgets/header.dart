@@ -10,6 +10,7 @@ class Header extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(top: 30),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
                 onTap: () {
@@ -30,17 +31,13 @@ class Header extends StatelessWidget {
                       backgroundImage: AssetImage('assets/images/avatar.png')),
                 ),
               ),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(width: 70),
-                  Text('Jobs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                  SizedBox(width: 120),
-                  Image(
-                    image: AssetImage('assets/images/bell.png'),
-                    width: 33,
-                  )
-                ],
+              const Image(
+                image: AssetImage('assets/images/techjobs_logo.png'),
+                height: 40,
+              ),
+              const Image(
+                image: AssetImage('assets/images/bell.png'),
+                width: 100,
               ),
             ],
           ),

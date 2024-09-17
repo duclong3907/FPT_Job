@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../models/job/job_model.dart';
 import '../repository/job_repos.dart';
+import '../utils/snackbar_get.dart';
 import 'auth_view_model.dart';
 
 class JobViewModel extends GetxController {
@@ -31,7 +32,7 @@ class JobViewModel extends GetxController {
       jobs.assignAll(jobList);
       allJobs.assignAll(jobList); // Populate allJobs
     } catch (e) {
-      Get.snackbar('Error', '$e');
+      SnackbarUtils.showErrorSnackbar('$e');
     } finally {
       isLoading.value = false;
     }
@@ -43,7 +44,7 @@ class JobViewModel extends GetxController {
       selectedJob.value = await jobRepository.fetchJobById(id);
     } catch (e) {
       print(e);
-      Get.snackbar('Title', 'Message');
+      SnackbarUtils.showErrorSnackbar('$e');
     } finally {
       isLoading.value = false;
     }
@@ -67,7 +68,7 @@ class JobViewModel extends GetxController {
       jobs.assignAll(jobList);
       allJobs.assignAll(jobList);
     } catch (e) {
-      Get.snackbar('Error', '$e');
+      SnackbarUtils.showErrorSnackbar('$e');
     } finally {
       isLoading.value = false;
     }
@@ -107,7 +108,7 @@ class JobViewModel extends GetxController {
       var jobList = await jobRepository.fetchJobsPostByEmployer(employerId);
       postedJobs.assignAll(jobList);
     } catch (e) {
-      Get.snackbar('Error', '$e');
+      SnackbarUtils.showErrorSnackbar('$e');
     } finally {
       isLoading.value = false;
     }

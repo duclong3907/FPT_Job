@@ -2,6 +2,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../repository/auth_repos.dart';
+import '../utils/snackbar_get.dart';
 import 'job_view_model.dart';
 
 class AuthViewModel extends GetxController {
@@ -38,11 +39,11 @@ class AuthViewModel extends GetxController {
         await jobViewModel.login(this.userId.value);
       } else {
         isLoggedIn.value = false;
-        Get.snackbar('Error', 'token is null');
+        SnackbarUtils.showErrorSnackbar('token is null');
       }
     } catch (e) {
       isLoggedIn.value = false;
-      Get.snackbar('Error', '$e');
+      SnackbarUtils.showErrorSnackbar('$e');
     }
   }
 
@@ -72,7 +73,7 @@ class AuthViewModel extends GetxController {
         role.value = '';
       }
     } catch (e) {
-      Get.snackbar('Error', '$e');
+      SnackbarUtils.showErrorSnackbar('$e');
     }
   }
 
@@ -99,12 +100,12 @@ class AuthViewModel extends GetxController {
       } else {
         isLoggedIn.value = false;
         print(response['message']);
-        Get.snackbar('Error', response['message']);
+        SnackbarUtils.showErrorSnackbar(response['message']);
       }
     } catch (e) {
       isLoggedIn.value = false;
       print('Error signing in with Google: $e');
-      Get.snackbar('Error', '$e');
+      SnackbarUtils.showErrorSnackbar('$e');
     }
   }
 
