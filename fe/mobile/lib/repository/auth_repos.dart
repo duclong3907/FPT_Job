@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../config/config_http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   final String apiUrl = '$baseUrlApi/Auth';
@@ -65,5 +66,46 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
   }
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: [
+      'email',
+    ],
+  );
+
+  Future<Map<String, dynamic>> signInWithGoogle(String role) async {
+    try {
+      // Trigger the Google Sign-In flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        return {'status': false, 'message': 'Google sign-in aborted'};
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Create the request URL with query parameters
+      final Uri requestUri = Uri.parse('$baseUrlApi/Auth/GoogleResponse')
+          .replace(queryParameters: {
+        'idToken': googleAuth.idToken,
+        'accessToken': googleAuth.accessToken,
+        'role': role,
+      });
+
+      // Send the request to your backend
+      final response = await http.get(requestUri);
+
+      if (response.statusCode == 200) {
+        // Parse the response
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return responseData;
+      } else {
+        return {'status': false, 'message': 'Failed to sign in with Google'};
+      }
+    } catch (error) {
+      return {'status': false, 'message': error.toString()};
+    }
+  }
+
 
 }

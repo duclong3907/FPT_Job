@@ -75,4 +75,37 @@ class AuthViewModel extends GetxController {
       Get.snackbar('Error', '$e');
     }
   }
+
+  Future<void> signinWithGoogle() async {
+    try {
+      final response = await _authService.signInWithGoogle('JobSeeker');
+      if (response['status']) {
+        final token = response['token'];
+        this.token.value = token;
+        // Decode the token to extract userId
+        final jwt = JWT.decode(token);
+        print('UserId: ${jwt.payload['UserId']}');
+        this.userId.value = jwt.payload['UserId'] as String;
+        this.role.value = jwt.payload['Role'] as String;
+        await SharedPreferences.getInstance().then((prefs) {
+          prefs.setString('token', token);
+          prefs.setString('userId', jwt.payload['UserId'] as String);
+          prefs.setString('role', jwt.payload['Role'] as String);
+        });
+        isLoggedIn.value = true;
+        // Refresh favorite jobs after login
+        final JobViewModel jobViewModel = Get.find<JobViewModel>();
+        await jobViewModel.login(this.userId.value);
+      } else {
+        isLoggedIn.value = false;
+        print(response['message']);
+        Get.snackbar('Error', response['message']);
+      }
+    } catch (e) {
+      isLoggedIn.value = false;
+      print('Error signing in with Google: $e');
+      Get.snackbar('Error', '$e');
+    }
+  }
+
 }

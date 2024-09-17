@@ -22,9 +22,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    //final JobViewModel jobViewModel = Get.put(JobViewModel(jobRepository: JobRepository()));
+    final JobViewModel jobViewModel = Get.put(JobViewModel(jobRepository: JobRepository()));
     final JobCategoryViewModel jobCategoryViewModel = Get.put(JobCategoryViewModel(jobCategoryRepository: JobCategoryRepository()));
-    final JobViewModel jobViewModel = Get.find<JobViewModel>();
+    // final JobViewModel jobViewModel = Get.find<JobViewModel>();
     return Scaffold(
       body: SafeArea(
         child: Scaffold(

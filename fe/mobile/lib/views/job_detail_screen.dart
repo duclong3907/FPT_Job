@@ -25,7 +25,10 @@ class JobDetailScreen extends StatelessWidget {
 
     return Scaffold(
       body: Obx(() {
-        if (jobViewModel.selectedJob.value == null) {
+        if(jobViewModel.isLoading.value) {
+          return Center(child: CircularProgressIndicator());
+        }
+        else if (jobViewModel.selectedJob.value == null) {
           return Center(child: Text('Job not found.'));
         } else {
           final job = jobViewModel.selectedJob.value!;

@@ -95,7 +95,7 @@ class LoginScreen extends StatelessWidget {
   Widget _buildGoogleSignInButton() {
     return ElevatedButton.icon(
       onPressed: () {
-
+        authViewModel.signinWithGoogle();
       },
       icon: Image.asset(
         'assets/images/google.png',
