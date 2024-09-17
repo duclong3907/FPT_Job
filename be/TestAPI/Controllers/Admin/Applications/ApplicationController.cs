@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +50,8 @@ namespace TestAPI.Controllers.Admin.Applications
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving the application" });
             }
         }
+
+        
 
         [HttpPost]
         public async Task<IActionResult> Post(Application application)
@@ -131,6 +134,61 @@ namespace TestAPI.Controllers.Admin.Applications
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while deleting the application" });
+            }
+        }
+
+        [HttpGet("User/{userId}")]
+        public async Task<IActionResult> GetUserApplications(string userId)
+        {
+            try
+            {
+                var applications = await _context.Applications
+                    .Where(app => app.UserId == userId)
+                    .ToListAsync();
+
+                if (applications == null || !applications.Any())
+                {
+                    return NotFound(new { message = "No applications found for this user" });
+                }
+
+                return Ok(new { applications, message = "Retrieve successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving user applications" });
+            }
+        }
+
+        [HttpGet("User/{userId}/Jobs")]
+        public async Task<IActionResult> GetUserAppliedJobs(string userId)
+        {
+            try
+            {
+                var appliedJobs = await _context.Applications
+                    .Where(app => app.UserId == userId)
+                    .Join(_context.Jobs,
+                          app => app.JobId,
+                          job => job.Id,
+                          (app, job) => new
+                          {
+                              JobId = job.Id,
+                              JobTitle = job.Title,
+                              JobDescription = job.Description,
+                              AppliedDate = app.Created_At,
+                              ApplicationStatus = app.status
+                          })
+                    .ToListAsync();
+
+                if (appliedJobs == null || !appliedJobs.Any())
+                {
+                    return NotFound(new { message = "No jobs found for this user" });
+                }
+
+                return Ok(new { appliedJobs, message = "Retrieve successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving applied jobs" });
             }
         }
     }

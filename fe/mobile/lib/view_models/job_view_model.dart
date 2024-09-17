@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../models/job/job_model.dart';
 import '../repository/job_repos.dart';
+import 'auth_view_model.dart';
 
 class JobViewModel extends GetxController {
   final JobRepository jobRepository;
@@ -10,12 +11,15 @@ class JobViewModel extends GetxController {
   var selectedJob = Rxn<Job>();
   var userId = ''.obs;
   var favoriteJobIds = <int>[].obs;
+  var postedJobs = <Job>[].obs;
+
 
   JobViewModel({required this.jobRepository});
 
   @override
   void onInit() {
     fetchJobs();
+    fetchJobsPostByEmployer(Get.find<AuthViewModel>().userId.value);
     super.onInit();
   }
 
@@ -69,22 +73,8 @@ class JobViewModel extends GetxController {
     }
   }
 
-  // void toggleFavorite(Job job, String userId) async {
-  //   this.userId.value = userId;
-  //   job.isFavorite = !job.isFavorite;
-  //   jobs.refresh();
-  //   await jobRepository.saveFavorites(jobs, userId);
-  // }
-  //
-  // Future<void> loadFavorites() async {
-  //   print(this.userId.value);
-  //   await jobRepository.loadFavorites(jobs, this.userId.value);
-  //   jobs.refresh();
-  // }
-
-
-  void toggleFavorite(Job job, String userId) async {
-    this.userId.value = userId;
+  void toggleFavorite(Job job) async {
+    final userId = Get.find<AuthViewModel>().userId.value;
     if (favoriteJobIds.contains(job.id)) {
       favoriteJobIds.remove(job.id);
       await jobRepository.deleteFavorite(job.id, userId);
@@ -108,6 +98,19 @@ class JobViewModel extends GetxController {
   Future<void> login(String userId) async {
     this.userId.value = userId;
     await loadFavorites(userId);
+  }
+
+
+  Future<void> fetchJobsPostByEmployer(String employerId) async {
+    isLoading.value = true;
+    try {
+      var jobList = await jobRepository.fetchJobsPostByEmployer(employerId);
+      postedJobs.assignAll(jobList);
+    } catch (e) {
+      Get.snackbar('Error', '$e');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
 }

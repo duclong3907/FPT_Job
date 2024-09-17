@@ -1,48 +1,89 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../view_models/auth_view_model.dart';
 import '../view_models/job_view_model.dart';
-import 'job_detail_screen.dart';
+import '../view_models/application_view_model.dart';
+import '../widgets/job_list_widget.dart';
 
-class FavoriteJobsPage extends StatelessWidget {
+class FavoriteJobsPage extends StatefulWidget {
+  @override
+  _FavoriteJobsPageState createState() => _FavoriteJobsPageState();
+}
+
+class _FavoriteJobsPageState extends State<FavoriteJobsPage> {
   final JobViewModel jobViewModel = Get.find<JobViewModel>();
+  final ApplicationViewModel applicationViewModel = Get.find<ApplicationViewModel>();
+  var authViewModel = Get.find<AuthViewModel>();
+  @override
+  void initState() {
+    super.initState();
+    final userId = authViewModel.userId.value;
+      applicationViewModel.fetchUserApplications(userId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Favorite Jobs'),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Jobs'),
+          bottom: TabBar(
+            tabs: [
+              const Tab(text: 'Favorite'),
+              Obx(() {
+                return (authViewModel.role.value == 'JobSeeker') ? const Tab(text: 'Applied')
+                    : (authViewModel.role.value == 'Employer')  ? const Tab(text: 'Posted Jobs')
+                    : (authViewModel.role.value == 'Admin') ? const Tab(text: 'Management Jobs')
+                    : const Tab(text: 'Unknown Role');
+              }),
+
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            Obx(() {
+              if (jobViewModel.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              } else {
+                final favoriteJobs = jobViewModel.jobs.where((job) => jobViewModel.isFavorite(job)).toList();
+                if (favoriteJobs.isEmpty) {
+                  return const Center(child: Text('No favorite jobs found.'));
+                } else {
+                  return JobListWidget(jobs: favoriteJobs);
+                }
+              }
+            }),
+            Obx(() {
+              if(authViewModel.role.value == 'JobSeeker'){
+                if (applicationViewModel.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                } else {
+                  final appliedJobs = jobViewModel.jobs.where((job) => applicationViewModel.userAppliedJobIds.contains(job.id)).toList();
+                  if (appliedJobs.isEmpty) {
+                    return Center(child: Text('No applied jobs found.'));
+                  } else {
+                    return JobListWidget(jobs: appliedJobs);
+                  }
+                }
+              } else if(authViewModel.role.value == 'Employer') {
+                if (jobViewModel.isLoading.value) {
+                  return Center(child: CircularProgressIndicator());
+                } else {
+                  if (jobViewModel.postedJobs.isEmpty) {
+                    return Center(child: Text('No posted jobs found.'));
+                  } else {
+                    return JobListWidget(jobs: jobViewModel.postedJobs);
+                  }
+                }
+              } else {
+                return Center(child: Text('Unknown Role'));
+              }
+            }),
+          ],
+        ),
       ),
-      body: Obx(() {
-        if (jobViewModel.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
-        } else {
-          final favoriteJobs = jobViewModel.jobs.where((job) => jobViewModel.isFavorite(job)).toList();
-          if (favoriteJobs.isEmpty) {
-            return Center(child: Text('No favorite jobs found.'));
-          } else {
-            return ListView.builder(
-              itemCount: favoriteJobs.length,
-              itemBuilder: (context, index) {
-                final job = favoriteJobs[index];
-                return ListTile(
-                  title: Text(job.title),
-                  subtitle: Text(job.jobCategory?.name ?? 'Unknown category'),
-                  onTap: () {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => JobDetailScreen(jobId: job.id),
-                        ),
-                      );
-                    });
-                  },
-                );
-              },
-            );
-          }
-        }
-      }),
     );
   }
 }

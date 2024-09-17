@@ -148,5 +148,48 @@ namespace TestAPI.Controllers.Admin.Jobs
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while deleted the job" });
             }
         }
+
+        [HttpGet("{jobId}/Applications")]
+        public async Task<IActionResult> FetchApplicationsForJob(int jobId)
+        {
+            try
+            {
+                var applications = await _context.Applications
+                    .Where(app => app.JobId == jobId)
+                    .Join(_context.Users,
+                          app => app.UserId,
+                          user => user.Id,
+                          (app, user) => new { app, user })
+                    .Join(_context.UserInfos,
+                          combined => combined.user.Id,
+                          userInfo => userInfo.UserId,
+                          (combined, userInfo) => new
+                          {
+                              ApplicationId = combined.app.Id,
+                              UserId = combined.user.Id,
+                              UserName = combined.user.UserName,
+                              FullName = userInfo.FullName,
+                              Image = userInfo.Image,
+                              UserEmail = combined.user.Email,
+                              Resume = combined.app.resume,
+                              CoverLetter = combined.app.coverLetter,
+                              SelfIntroduction = combined.app.selfIntroduction,
+                              ApplicationStatus = combined.app.status,
+                              AppliedDate = combined.app.Created_At
+                          })
+                    .ToListAsync();
+
+                if (applications == null || !applications.Any())
+                {
+                    return NotFound(new { message = "No applications found for this job" });
+                }
+
+                return Ok(new { applications, message = "Retrieve successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving applications for the job" });
+            }
+        }
     }
 }

@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../job/job_model.dart';
+
 part 'application_model.g.dart';
 
 @JsonSerializable()

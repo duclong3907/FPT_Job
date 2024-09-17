@@ -38,4 +38,23 @@ class ApplicationRepository {
       throw Exception(errorResponse["message"]);
     }
   }
+
+  Future<List<Application>> fetchUserApplications(String userId) async {
+    HttpOverrides.global = MyHttpOverrides();
+    print('Fetching applications for user: $userId'); // Kiểm tra xem phương thức có được gọi không
+    final response = await http.get(Uri.parse('$baseUrl/Application/User/$userId'));
+
+    print('Response status: ${response.statusCode}'); // Kiểm tra trạng thái phản hồi
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      List<dynamic> jsonList = jsonResponse['applications'];
+      print('Fetched applications: $jsonList'); // Kiểm tra dữ liệu nhận được
+      return jsonList.map((json) => Application.fromJson(json)).toList();
+    } else {
+      final Map<String, dynamic> errorResponse = json.decode(response.body);
+      print('Error response: $errorResponse'); // Kiểm tra lỗi nếu có
+      throw Exception(errorResponse["message"]);
+    }
+  }
+
 }
