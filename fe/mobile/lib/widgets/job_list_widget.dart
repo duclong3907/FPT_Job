@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobile/view_models/auth_view_model.dart';
 import '../models/job/job_model.dart';
 import '../utils/time_ago.dart';
 import '../view_models/job_view_model.dart';
+import '../views/job_application_screen.dart';
 import '../views/job_detail_screen.dart';
 import 'custom_image_widget.dart';
 
 class JobListWidget extends StatelessWidget {
   final List<Job> jobs;
 
+
   const JobListWidget({super.key, required this.jobs});
 
   @override
   Widget build(BuildContext context) {
+    AuthViewModel authViewModel = Get.find<AuthViewModel>();
     return ListView.builder(
       itemCount: jobs.length,
       itemBuilder: (context, index) {
@@ -29,7 +33,10 @@ class JobListWidget extends StatelessWidget {
             }),
           ),
           onTap: () {
-            print('Job tapped: ${job.title}');
+            if(authViewModel.role.value == 'Employer'){
+              Get.to(() => JobApplicationsPage(jobId: job.id));
+              return;
+            }
             Get.to(() => JobDetailScreen(jobId: job.id));
           },
         );

@@ -1,16 +1,18 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import '../job/job_model.dart';
-
 part 'application_model.g.dart';
 
 @JsonSerializable()
 class Application {
   int id;
+  String? userName;
+  String? fullName;
+  String? image;
+  String? userEmail;
   String resume;
   String coverLetter;
   String selfIntroduction;
-  String status;
+  String? status;
   int jobId;
   String userId;
   @JsonKey(name: 'created_At')
@@ -18,13 +20,16 @@ class Application {
   @JsonKey(name: 'updated_At')
   DateTime? updatedAt;
 
-
   Application({
     required this.id,
+    this.userName,
+    this.fullName,
+    this.image,
+    this.userEmail,
     required this.resume,
     required this.coverLetter,
     required this.selfIntroduction,
-    required this.status,
+    this.status,
     required this.jobId,
     required this.userId,
     this.createdAt,

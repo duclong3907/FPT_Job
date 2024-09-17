@@ -57,4 +57,26 @@ class ApplicationRepository {
     }
   }
 
+  Future<List<Application>> fetchApplicationsForJob(int jobId) async {
+    try {
+      final url = Uri.parse('$baseUrl/Job/$jobId/Applications');
+      HttpOverrides.global = MyHttpOverrides();
+      final response = await http.get(url, headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+      });
+      print(url);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseBody = json.decode(response.body);
+        final List<dynamic> applicationsJson = responseBody['applications'];
+        print(responseBody);
+        return applicationsJson.map((json) => Application.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load applications');
+      }
+    } catch (e) {
+      throw Exception('Error fetching applications: $e');
+    }
+  }
+
 }

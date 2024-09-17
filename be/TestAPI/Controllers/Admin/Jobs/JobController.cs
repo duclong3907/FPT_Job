@@ -165,10 +165,11 @@ namespace TestAPI.Controllers.Admin.Jobs
                           userInfo => userInfo.UserId,
                           (combined, userInfo) => new
                           {
-                              ApplicationId = combined.app.Id,
+                              Id = combined.app.Id,
                               UserId = combined.user.Id,
                               UserName = combined.user.UserName,
                               FullName = userInfo.FullName,
+                              JobId = jobId,
                               Image = userInfo.Image,
                               UserEmail = combined.user.Email,
                               Resume = combined.app.resume,

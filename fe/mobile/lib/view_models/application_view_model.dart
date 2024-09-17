@@ -8,6 +8,7 @@ class ApplicationViewModel extends GetxController {
   final ApplicationRepository _applicationRepository = ApplicationRepository();
   var isLoading = false.obs;
   var userAppliedJobIds = <int>[].obs;
+  var jobApplications = <Application>[].obs;
 
   @override
   void onInit() {
@@ -51,6 +52,19 @@ class ApplicationViewModel extends GetxController {
       print('User applied job IDs: ${userAppliedJobIds.value}');
     } catch (e) {
       print('Error fetching user applications: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchApplicationsForJob(int jobId) async {
+    isLoading.value = true;
+    try {
+      var applications = await _applicationRepository.fetchApplicationsForJob(jobId);
+      jobApplications.assignAll(applications);
+    } catch (e) {
+      print(e);
+      Get.snackbar('Error', '$e');
     } finally {
       isLoading.value = false;
     }
