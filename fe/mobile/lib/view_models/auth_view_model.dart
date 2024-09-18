@@ -36,7 +36,7 @@ class AuthViewModel extends GetxController {
         isLoggedIn.value = true;
         // Refresh favorite jobs after login
         final JobViewModel jobViewModel = Get.find<JobViewModel>();
-        await jobViewModel.login(this.userId.value);
+        await jobViewModel.login(this.userId.value, this.role.value);
       } else {
         isLoggedIn.value = false;
         SnackbarUtils.showErrorSnackbar('token is null');
@@ -96,7 +96,7 @@ class AuthViewModel extends GetxController {
         isLoggedIn.value = true;
         // Refresh favorite jobs after login
         final JobViewModel jobViewModel = Get.find<JobViewModel>();
-        await jobViewModel.login(this.userId.value);
+        await jobViewModel.login(this.userId.value, this.role.value);
       } else {
         isLoggedIn.value = false;
         print(response['message']);

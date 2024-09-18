@@ -137,7 +137,7 @@ class JobApplicationsPage extends StatelessWidget {
                 Row(
                   children: [
                     const Text('Status: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(application.status ?? 'No Status'),
+                    Text(application.status!),
                   ],
                 ),
               ],

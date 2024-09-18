@@ -28,7 +28,7 @@ class ApplicationViewModel extends GetxController {
       applications.value = result;
     } catch (e) {
       print('Error fetching applications: $e');
-      SnackbarUtils.showErrorSnackbar('$e');
+      // SnackbarUtils.showErrorSnackbar('$e');
     }
   }
 
@@ -53,7 +53,7 @@ class ApplicationViewModel extends GetxController {
       print('User applied job IDs: ${userAppliedJobIds.value}');
     } catch (e) {
       print('Error fetching user applications: $e');
-      SnackbarUtils.showErrorSnackbar('$e');
+      // SnackbarUtils.showErrorSnackbar('$e');
     } finally {
       isLoading.value = false;
     }
@@ -66,7 +66,7 @@ class ApplicationViewModel extends GetxController {
       jobApplications.assignAll(applications);
     } catch (e) {
       print(e);
-      SnackbarUtils.showErrorSnackbar('$e');
+      // SnackbarUtils.showErrorSnackbar('$e');
     } finally {
       isLoading.value = false;
     }

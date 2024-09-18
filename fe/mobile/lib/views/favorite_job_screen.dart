@@ -51,7 +51,7 @@ class _FavoriteJobsPageState extends State<FavoriteJobsPage> {
                 if (favoriteJobs.isEmpty) {
                   return const Center(child: Text('No favorite jobs found.'));
                 } else {
-                  return JobListWidget(jobs: favoriteJobs);
+                  return JobListWidget(jobs: favoriteJobs, source: 'detail_job');
                 }
               }
             }),
@@ -64,7 +64,7 @@ class _FavoriteJobsPageState extends State<FavoriteJobsPage> {
                   if (appliedJobs.isEmpty) {
                     return Center(child: Text('No applied jobs found.'));
                   } else {
-                    return JobListWidget(jobs: appliedJobs);
+                    return JobListWidget(jobs: appliedJobs, source: 'detail_job');
                   }
                 }
               } else if(authViewModel.role.value == 'Employer') {
@@ -74,7 +74,7 @@ class _FavoriteJobsPageState extends State<FavoriteJobsPage> {
                   if (jobViewModel.postedJobs.isEmpty) {
                     return Center(child: Text('No posted jobs found.'));
                   } else {
-                    return JobListWidget(jobs: jobViewModel.postedJobs);
+                    return JobListWidget(jobs: jobViewModel.postedJobs, source: 'detail_application_job');
                   }
                 }
               } else {

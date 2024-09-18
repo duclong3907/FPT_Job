@@ -13,7 +13,7 @@ class JobList extends StatelessWidget {
         return Center(child: CircularProgressIndicator());
       }
       return Expanded(
-        child: JobListWidget(jobs: jobViewModel.jobs),
+        child: JobListWidget(jobs: jobViewModel.jobs, source: 'detail_job'),
       );
     });
   }

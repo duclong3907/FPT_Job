@@ -172,6 +172,7 @@ namespace TestAPI.Controllers.Admin.Jobs
                               JobId = jobId,
                               Image = userInfo.Image,
                               UserEmail = combined.user.Email,
+                              Status = combined.app.status,
                               Resume = combined.app.resume,
                               CoverLetter = combined.app.coverLetter,
                               SelfIntroduction = combined.app.selfIntroduction,

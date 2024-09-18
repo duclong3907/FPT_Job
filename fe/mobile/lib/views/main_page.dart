@@ -41,7 +41,7 @@ class _MainScreenState extends State<MainScreen> {
             return BottomNavigationBar(
               currentIndex: index,
               onTap: (value) {
-                if (value == 1 && !authViewModel.isLoggedIn.value) {
+                if ((value == 1 || value == 2) && !authViewModel.isLoggedIn.value) {
                   SnackbarUtils.showWarningSnackbar(
                       'You must be logged in to access this screen!');
                 } else {

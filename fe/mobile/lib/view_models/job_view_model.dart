@@ -20,7 +20,7 @@ class JobViewModel extends GetxController {
   @override
   void onInit() {
     fetchJobs();
-    fetchJobsPostByEmployer(Get.find<AuthViewModel>().userId.value);
+    // fetchJobsPostByEmployer(Get.find<AuthViewModel>().userId.value);
     super.onInit();
   }
 
@@ -96,9 +96,13 @@ class JobViewModel extends GetxController {
     return favoriteJobIds.contains(job.id);
   }
 
-  Future<void> login(String userId) async {
+  Future<void> login(String userId, String Role) async {
     this.userId.value = userId;
     await loadFavorites(userId);
+    if(Role == 'Employer') {
+      await fetchJobsPostByEmployer(userId);
+    }
+
   }
 
 
