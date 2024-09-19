@@ -1,9 +1,9 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../repository/auth_repos.dart';
 import '../utils/snackbar_get.dart';
 import 'job_view_model.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthViewModel extends GetxController {
   var token = ''.obs;
@@ -12,6 +12,7 @@ class AuthViewModel extends GetxController {
   var role = ''.obs;
   var isLoading = false.obs;
   final AuthService _authService = AuthService();
+  final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
   @override
   void onInit() {
@@ -28,11 +29,9 @@ class AuthViewModel extends GetxController {
         print('UserId: ${jwt.payload['UserId']}');
         this.userId.value = jwt.payload['UserId'];
         this.role.value = jwt.payload['Role'];
-        await SharedPreferences.getInstance().then((prefs) {
-          prefs.setString('token', token);
-          prefs.setString('userId', jwt.payload['UserId']);
-          prefs.setString('role', jwt.payload['Role']);
-        });
+        await secureStorage.write(key: 'token', value: token);
+        await secureStorage.write(key: 'userId', value: jwt.payload['UserId']);
+        await secureStorage.write(key: 'role', value: jwt.payload['Role']);
         isLoggedIn.value = true;
         // Refresh favorite jobs after login
         final JobViewModel jobViewModel = Get.find<JobViewModel>();
@@ -46,7 +45,6 @@ class AuthViewModel extends GetxController {
       SnackbarUtils.showErrorSnackbar('$e');
     }
   }
-
 
   void checkLogin() async {
     final token = await _authService.getToken();
@@ -62,11 +60,9 @@ class AuthViewModel extends GetxController {
       final token = await _authService.getToken();
       if (token != null) {
         await _authService.logout(token);
-        await SharedPreferences.getInstance().then((prefs) {
-          prefs.remove('token');
-          prefs.remove('userId');
-          prefs.remove('role');
-        });
+        await secureStorage.delete(key: 'token');
+        await secureStorage.delete(key: 'userId');
+        await secureStorage.delete(key: 'role');
         isLoggedIn.value = false;
         this.token.value = '';
         userId.value = '';
@@ -88,11 +84,9 @@ class AuthViewModel extends GetxController {
         print('UserId: ${jwt.payload['UserId']}');
         this.userId.value = jwt.payload['UserId'] as String;
         this.role.value = jwt.payload['Role'] as String;
-        await SharedPreferences.getInstance().then((prefs) {
-          prefs.setString('token', token);
-          prefs.setString('userId', jwt.payload['UserId'] as String);
-          prefs.setString('role', jwt.payload['Role'] as String);
-        });
+        await secureStorage.write(key: 'token', value: token);
+        await secureStorage.write(key: 'userId', value: jwt.payload['UserId'] as String);
+        await secureStorage.write(key: 'role', value: jwt.payload['Role'] as String);
         isLoggedIn.value = true;
         // Refresh favorite jobs after login
         final JobViewModel jobViewModel = Get.find<JobViewModel>();

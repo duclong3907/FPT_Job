@@ -93,7 +93,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-                JobList(),
+                Expanded(child: JobList()),
               ],
             ),
           ),

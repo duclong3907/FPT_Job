@@ -10,11 +10,9 @@ class JobList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       if (jobViewModel.jobs.isEmpty) {
-        return Center(child: CircularProgressIndicator());
+        return Center(child: Text('No jobs available'));
       }
-      return Expanded(
-        child: JobListWidget(jobs: jobViewModel.jobs, source: 'detail_job'),
-      );
+      return JobListWidget(jobs: jobViewModel.jobs, source: 'detail_job');
     });
   }
 }

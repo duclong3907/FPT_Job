@@ -4,9 +4,11 @@ import 'package:http/http.dart' as http;
 import '../config/config_http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
   final String apiUrl = '$baseUrlApi/Auth';
+  final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
   Future<String?> login(String userName, String password) async {
     final url = Uri.parse('$apiUrl/Login');
@@ -23,9 +25,7 @@ class AuthService {
         final data = jsonDecode(response.body);
         final token = data['token'];
 
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);
+        await secureStorage.write(key: 'token', value: token);
 
 
         return token;
@@ -53,7 +53,7 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        await prefs.remove('token');
+        await secureStorage.delete(key: 'token');
       } else {
         final Map<String, dynamic> errorResponse = json.decode(response.body);
         throw Exception(errorResponse["message"]);
@@ -63,8 +63,7 @@ class AuthService {
   }
 
   Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token');
+    return await secureStorage.read(key: 'token');
   }
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
