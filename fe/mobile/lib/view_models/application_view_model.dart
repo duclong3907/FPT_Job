@@ -72,4 +72,18 @@ class ApplicationViewModel extends GetxController {
     }
   }
 
+  Future<void> updateApplication(int applicationId, Map<String, String> requestBody) async{
+    try {
+      await _applicationRepository.updateApplication(applicationId, requestBody);
+      int index = jobApplications.indexWhere((app) => app.id == applicationId);
+      if (index != -1) {
+        jobApplications[index].status = requestBody['status']!;
+      }
+      SnackbarUtils.showSuccessSnackbar('Updated successfully!');
+    } catch (e) {
+      print('Error updating application: $e');
+      SnackbarUtils.showErrorSnackbar('$e');
+    }
+  }
+
 }

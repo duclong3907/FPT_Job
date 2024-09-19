@@ -311,97 +311,6 @@ namespace TestAPI.Controllers.Auth
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
-        //[HttpGet("GoogleResponse")]
-        //public async Task<IActionResult> GoogleResponse(string role)
-        //{
-        //    var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-
-        //    if (result?.Succeeded != true)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    // Extract the user's email from the Google authentication result
-        //    var email = result.Principal.FindFirstValue(ClaimTypes.Email);
-
-        //    // Find the user in your database
-        //    var user = await _userManager.FindByEmailAsync(email);
-
-        //    if (user == null)
-        //    {
-        //        // Create a new user with the email from Google
-        //        var newUser = new IdentityUser { UserName = email, Email = email };
-        //        var createResult = await _userManager.CreateAsync(newUser);
-        //        if (createResult.Succeeded)
-        //        {
-        //            user = newUser;
-
-        //            // Send confirmation email
-        //            var loginUser = new LoginUser { UserName = user.UserName };
-        //            await SendConfirmationEmail(loginUser.UserName, user);
-
-        //            await _authService.AddUserInfo(result.Principal, newUser);
-
-        //            // Check if the selected role is valid
-        //            if (role.ToLower() != "jobseeker" && role.ToLower() != "employer")
-        //            {
-        //                return BadRequest(new { status = false, message = "Invalid role selected" });
-        //            }
-
-        //            // Get the selected role
-        //            var selectedRole = await _roleManager.FindByNameAsync(role);
-        //            if (selectedRole != null)
-        //            {
-        //                // Add the user to the selected role
-        //                var addToRoleResult = await _userManager.AddToRoleAsync(user, selectedRole.Name);
-        //                if (!addToRoleResult.Succeeded)
-        //                {
-        //                    // _logger.LogError("Failed to add user to selected role");
-        //                    return BadRequest(new { status = false, message = "Error adding user to selected role" });
-        //                }
-        //            }
-
-        //            //return Ok("A confirmation email has been sent. Please check your email.");
-        //            return Redirect("http://localhost:3000/signin?checkConfirm=true");
-        //        }
-        //        else
-        //        {
-        //            // Handle errors during user creation
-        //            return BadRequest("Error creating new user");
-        //        }
-        //    }
-
-        //    if (!user.EmailConfirmed)
-        //    {
-        //        var loginUser = new LoginUser { UserName = user.UserName };
-        //        await SendConfirmationEmail(loginUser.UserName, user);
-        //        return Redirect("http://localhost:3000/signin?checkConfirm=true");
-        //        //return BadRequest("Email not confirmed. A confirmation email has been sent.");
-        //    }
-
-        //    // Get user roles
-        //    var roles = await _userManager.GetRolesAsync(user);
-
-        //    // Generate a JWT for the user
-        //    var tokenString = _authService.GenerateTokenString(user.UserName, roles, user.Id);
-
-        //    // Generate OTP
-        //    if (user.TwoFactorEnabled)
-        //    {
-        //        var otp = _otpService.GenerateOTP();
-        //        await _userManager.SetAuthenticationTokenAsync(user, "2FA", "OTP", otp);
-        //        await _emailService.SendEmailAsync(user.UserName, "Your OTP", $"Your OTP is {otp}");
-
-        //        //return Ok(new { Message = "OTP has been sent to your email. Please verify it." });
-        //        return Redirect($"http://localhost:3000/signin?checkOTP={tokenString}");
-        //    }
-
-        //    // Return the token to the client
-        //    //return Ok(new { Message = "Login Success!", Token = tokenString });
-        //    return Redirect($"http://localhost:3000/callback?token={tokenString}");
-        //}
-
-
         [HttpGet("GoogleResponse")]
         public async Task<IActionResult> GoogleResponse(string role)
         {
@@ -409,7 +318,7 @@ namespace TestAPI.Controllers.Auth
 
             if (result?.Succeeded != true)
             {
-                return BadRequest(new { status = false, message = "Google authentication failed" });
+                return BadRequest();
             }
 
             // Extract the user's email from the Google authentication result
@@ -447,16 +356,18 @@ namespace TestAPI.Controllers.Auth
                         var addToRoleResult = await _userManager.AddToRoleAsync(user, selectedRole.Name);
                         if (!addToRoleResult.Succeeded)
                         {
+                            // _logger.LogError("Failed to add user to selected role");
                             return BadRequest(new { status = false, message = "Error adding user to selected role" });
                         }
                     }
 
-                    return Ok(new { status = true, message = "A confirmation email has been sent. Please check your email." });
+                    //return Ok("A confirmation email has been sent. Please check your email.");
+                    return Redirect("http://localhost:3000/signin?checkConfirm=true");
                 }
                 else
                 {
                     // Handle errors during user creation
-                    return BadRequest(new { status = false, message = "Error creating new user" });
+                    return BadRequest("Error creating new user");
                 }
             }
 
@@ -464,7 +375,8 @@ namespace TestAPI.Controllers.Auth
             {
                 var loginUser = new LoginUser { UserName = user.UserName };
                 await SendConfirmationEmail(loginUser.UserName, user);
-                return Ok(new { status = true, message = "Email not confirmed. A confirmation email has been sent." });
+                return Redirect("http://localhost:3000/signin?checkConfirm=true");
+                //return BadRequest("Email not confirmed. A confirmation email has been sent.");
             }
 
             // Get user roles
@@ -480,12 +392,100 @@ namespace TestAPI.Controllers.Auth
                 await _userManager.SetAuthenticationTokenAsync(user, "2FA", "OTP", otp);
                 await _emailService.SendEmailAsync(user.UserName, "Your OTP", $"Your OTP is {otp}");
 
-                return Ok(new { status = true, message = "OTP has been sent to your email. Please verify it.", token = tokenString });
+                //return Ok(new { Message = "OTP has been sent to your email. Please verify it." });
+                return Redirect($"http://localhost:3000/signin?checkOTP={tokenString}");
             }
 
             // Return the token to the client
-            return Ok(new { status = true, message = "Login Success!", token = tokenString });
+            //return Ok(new { Message = "Login Success!", Token = tokenString });
+            return Redirect($"http://localhost:3000/callback?token={tokenString}");
         }
+
+
+        //[HttpGet("GoogleResponse")]
+        //public async Task<IActionResult> GoogleResponse(string role)
+        //{
+        //    var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+        //    if (result?.Succeeded != true)
+        //    {
+        //        return BadRequest(new { status = false, message = "Google authentication failed" });
+        //    }
+
+        //    // Extract the user's email from the Google authentication result
+        //    var email = result.Principal.FindFirstValue(ClaimTypes.Email);
+
+        //    // Find the user in your database
+        //    var user = await _userManager.FindByEmailAsync(email);
+
+        //    if (user == null)
+        //    {
+        //        // Create a new user with the email from Google
+        //        var newUser = new IdentityUser { UserName = email, Email = email };
+        //        var createResult = await _userManager.CreateAsync(newUser);
+        //        if (createResult.Succeeded)
+        //        {
+        //            user = newUser;
+
+        //            // Send confirmation email
+        //            var loginUser = new LoginUser { UserName = user.UserName };
+        //            await SendConfirmationEmail(loginUser.UserName, user);
+
+        //            await _authService.AddUserInfo(result.Principal, newUser);
+
+        //            // Check if the selected role is valid
+        //            if (role.ToLower() != "jobseeker" && role.ToLower() != "employer")
+        //            {
+        //                return BadRequest(new { status = false, message = "Invalid role selected" });
+        //            }
+
+        //            // Get the selected role
+        //            var selectedRole = await _roleManager.FindByNameAsync(role);
+        //            if (selectedRole != null)
+        //            {
+        //                // Add the user to the selected role
+        //                var addToRoleResult = await _userManager.AddToRoleAsync(user, selectedRole.Name);
+        //                if (!addToRoleResult.Succeeded)
+        //                {
+        //                    return BadRequest(new { status = false, message = "Error adding user to selected role" });
+        //                }
+        //            }
+
+        //            return Ok(new { status = true, message = "A confirmation email has been sent. Please check your email." });
+        //        }
+        //        else
+        //        {
+        //            // Handle errors during user creation
+        //            return BadRequest(new { status = false, message = "Error creating new user" });
+        //        }
+        //    }
+
+        //    if (!user.EmailConfirmed)
+        //    {
+        //        var loginUser = new LoginUser { UserName = user.UserName };
+        //        await SendConfirmationEmail(loginUser.UserName, user);
+        //        return Ok(new { status = true, message = "Email not confirmed. A confirmation email has been sent." });
+        //    }
+
+        //    // Get user roles
+        //    var roles = await _userManager.GetRolesAsync(user);
+
+        //    // Generate a JWT for the user
+        //    var tokenString = _authService.GenerateTokenString(user.UserName, roles, user.Id);
+
+        //    // Generate OTP
+        //    if (user.TwoFactorEnabled)
+        //    {
+        //        var otp = _otpService.GenerateOTP();
+        //        await _userManager.SetAuthenticationTokenAsync(user, "2FA", "OTP", otp);
+        //        await _emailService.SendEmailAsync(user.UserName, "Your OTP", $"Your OTP is {otp}");
+
+        //        return Ok(new { status = true, message = "OTP has been sent to your email. Please verify it.", token = tokenString });
+        //    }
+
+        //    // Return the token to the client
+        //    return Ok(new { status = true, message = "Login Success!", token = tokenString });
+        //}
 
 
         [HttpPost("LogoutGoogle")]

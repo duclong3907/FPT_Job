@@ -79,4 +79,21 @@ class ApplicationRepository {
     }
   }
 
+  Future<void> updateApplication(int applicationId, Map<String, String> requestBody) async {
+    HttpOverrides.global = MyHttpOverrides();
+    final url = Uri.parse('$baseUrl/Application/$applicationId');
+    final body = json.encode(requestBody);
+    final response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: body,
+    );
+
+    if (response.statusCode != 200) {
+      final Map<String, dynamic> errorResponse = json.decode(response.body);
+      throw Exception(errorResponse["message"]);
+    }
+  }
+
+
 }

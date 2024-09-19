@@ -5,10 +5,11 @@ import 'package:get/get.dart';
 import '../models/application/application_model.dart';
 import '../view_models/application_view_model.dart';
 
+final ApplicationViewModel applicationViewModel =
+    Get.find<ApplicationViewModel>();
+
 class JobApplicationsPage extends StatelessWidget {
   final int jobId;
-  final ApplicationViewModel applicationViewModel = Get.find<ApplicationViewModel>();
-
   JobApplicationsPage({required this.jobId});
 
   @override
@@ -33,23 +34,22 @@ class JobApplicationsPage extends StatelessWidget {
                 child: ListTile(
                   leading: application.image != null
                       ? CircleAvatar(
-                    radius: 30,
-                    backgroundImage: MemoryImage(
-                      base64Decode(
-                        application.image!.replaceFirst('data:image/jpeg;base64,', ''),
-                      ),
-                    ),
-                  )
+                          radius: 30,
+                          backgroundImage: MemoryImage(
+                            base64Decode(
+                              application.image!
+                                  .replaceFirst('data:image/jpeg;base64,', ''),
+                            ),
+                          ),
+                        )
                       : const CircleAvatar(
-                    radius: 30,
-                    child: Icon(Icons.person),
-                  ),
+                          radius: 30,
+                          child: Icon(Icons.person),
+                        ),
                   title: Text(application.fullName ?? 'No Name'),
                   subtitle: Text(application.userEmail ?? 'No Email'),
                 ),
-                onTap: () {
-                  _showDetail(context, application);
-                },
+                onTap: () => Get.dialog(_ShowDetail(application: application)),
               );
             },
           );
@@ -57,102 +57,162 @@ class JobApplicationsPage extends StatelessWidget {
       }),
     );
   }
+}
 
-  void _showDetail(BuildContext context, Application application) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                if (application.image != null)
-                  CircleAvatar(
-                    radius: 70,
-                    backgroundImage: MemoryImage(
-                      base64Decode(
-                        application.image!.replaceFirst('data:image/jpeg;base64,', ''),
-                      ),
-                    ),
-                  )
-                else
-                  const CircleAvatar(
-                    radius: 30,
-                    child: Icon(Icons.person),
+class _ShowDetail extends StatelessWidget {
+  Application application;
+  ValueNotifier<String> statusNotifier;
+  _ShowDetail({required this.application})
+      : statusNotifier = ValueNotifier(application.status ?? 'No Status');
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: SingleChildScrollView(
+        child: Column(
+          children: [
+            if (application.image != null)
+              CircleAvatar(
+                radius: 70,
+                backgroundImage: MemoryImage(
+                  base64Decode(
+                    application.image!
+                        .replaceFirst('data:image/jpeg;base64,', ''),
                   ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Text('Name: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(application.fullName ?? 'No Name'),
-                  ],
                 ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Text('Email: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(application.userEmail ?? 'No Email'),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Text('Resume: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Expanded(
-                      child: Text(
-                        application.resume,
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Text('Cover Letter: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Expanded(
-                      child: Text(
-                        application.coverLetter ?? 'No Cover Letter',
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Text('Self Introduction: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Expanded(
-                      child: Text(
-                        application.selfIntroduction ?? 'No Self Introduction',
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Text('Status: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(application.status!),
-                  ],
+              )
+            else
+              const CircleAvatar(
+                radius: 30,
+                child: Icon(Icons.person),
+              ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Text('Name: ',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(application.fullName ?? 'No Name'),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Text('Email: ',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(application.userEmail ?? 'No Email'),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Text('Resume: ',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Expanded(
+                  child: Text(
+                    application.resume,
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                  ),
                 ),
               ],
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Close'),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Text('Cover Letter: ',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Expanded(
+                  child: Text(
+                    application.coverLetter ?? 'No Cover Letter',
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Text('Self Introduction: ',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Expanded(
+                  child: Text(
+                    application.selfIntroduction ?? 'No Self Introduction',
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Text('Status: ',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                ValueListenableBuilder<String>(
+                  valueListenable: statusNotifier,
+                  builder: (context, status, child) {
+                    return Expanded(
+                      child: Row(
+                        children: [
+                          Text(status),
+                          const Spacer(),
+                          Icon(
+                            status == 'pending'
+                                ? Icons.pending_actions
+                                : status == 'accepted'
+                                ? Icons.check_circle
+                                : Icons.cancel,
+                            color: status == 'pending'
+                                ? Colors.orange
+                                : status == 'accepted'
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ],
-        );
-      },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            updateApplication('rejected');
+          },
+          child: Text('Reject'),
+        ),
+        TextButton(
+          onPressed: () {
+            updateApplication('accepted');
+          },
+          child: Text('Approve'),
+        ),
+        TextButton(
+          onPressed: () {
+            Get.back();
+          },
+          child: Text('Close'),
+        ),
+      ],
     );
+  }
+
+  void updateApplication(String status) {
+    applicationViewModel.updateApplication(application.id!, {
+      'resume': application.resume,
+      'coverLetter': application.coverLetter,
+      'selfIntroduction': application.selfIntroduction,
+      'jobId': application.jobId.toString(),
+      'userId': application.userId,
+      'createdAt': application.createdAt.toString(),
+      'updatedAt': application.updatedAt.toString(),
+      'status': status,
+    });
+    statusNotifier.value = status;
   }
 }
