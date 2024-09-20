@@ -12,6 +12,7 @@ class SnackbarUtils {
       snackPosition: SnackPosition.TOP,
       margin: EdgeInsets.all(10),
       borderRadius: 10,
+      duration: Duration(seconds: 5),
     );
   }
 
@@ -25,6 +26,7 @@ class SnackbarUtils {
       snackPosition: SnackPosition.TOP,
       margin: EdgeInsets.all(10),
       borderRadius: 10,
+      duration: Duration(seconds: 5),
     );
   }
 
@@ -38,6 +40,7 @@ class SnackbarUtils {
       snackPosition: SnackPosition.TOP,
       margin: EdgeInsets.all(10),
       borderRadius: 10,
+      duration: Duration(seconds: 5),
     );
   }
 }

@@ -6,9 +6,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../models/auth/login_user_model.dart';
+
 class AuthService {
   final String apiUrl = '$baseUrlApi/Auth';
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
+
+  AuthService(){
+    HttpOverrides.global = MyHttpOverrides();
+  }
+
+  Future<Map<String, dynamic>> registerUser(LoginUser user) async {
+    final url = Uri.parse('$apiUrl/Register');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(user.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return {'status': true, 'message': response.body};
+    } else {
+      return {'status': false, 'message': jsonDecode(response.body)['message']};
+    }
+  }
 
   Future<String?> login(String userName, String password) async {
     final url = Uri.parse('$apiUrl/Login');
@@ -37,6 +58,7 @@ class AuthService {
       throw Exception('Error logging in: $e');
     }
   }
+
 
   Future<bool> logout(String token) async {
     final prefs = await SharedPreferences.getInstance();

@@ -43,6 +43,7 @@ namespace TestAPI.Controllers.Admin.Users
                     roles = roles,
                     fullName = userInfo?.FullName,
                     image = userInfo?.Image,
+                    company = userInfo?.Company
                 });
             }
 
@@ -95,6 +96,7 @@ namespace TestAPI.Controllers.Admin.Users
                 {
                     UserId = user.Id,
                     FullName = model.FullName,
+                    Company = model.Company,
                     Skill = "",
                     Expericene = "",
                 };
@@ -129,6 +131,7 @@ namespace TestAPI.Controllers.Admin.Users
                     roles = roles,
                     fullName = userInfo?.FullName,
                     image = userInfo?.Image,
+                    company = userInfo?.Company,
                 };
             }
             catch (Exception ex)
@@ -196,6 +199,7 @@ namespace TestAPI.Controllers.Admin.Users
 
                 userInfo.FullName = model.FullName;
                 userInfo.Image = model.Image;
+                userInfo.Company = model.Company;
                 await _context.SaveChangesAsync();
                 // notification clients
                 await _hubContext.Clients.All.SendAsync("updatedUser", user);

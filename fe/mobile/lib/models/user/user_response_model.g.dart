@@ -11,6 +11,7 @@ UserResponse _$UserResponseFromJson(Map<String, dynamic> json) => UserResponse(
       roles: (json['roles'] as List<dynamic>).map((e) => e as String).toList(),
       fullName: json['fullName'] as String,
       image: json['image'] as String?,
+      company: json['company'] as String?,
     );
 
 Map<String, dynamic> _$UserResponseToJson(UserResponse instance) =>
@@ -19,4 +20,5 @@ Map<String, dynamic> _$UserResponseToJson(UserResponse instance) =>
       'roles': instance.roles,
       'fullName': instance.fullName,
       'image': instance.image,
+      'company': instance.company,
     };

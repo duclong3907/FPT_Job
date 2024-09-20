@@ -1,5 +1,7 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import '../models/auth/login_user_model.dart';
 import '../repository/auth_repos.dart';
 import '../utils/snackbar_get.dart';
 import 'job_view_model.dart';
@@ -11,6 +13,7 @@ class AuthViewModel extends GetxController {
   var userId = ''.obs;
   var role = ''.obs;
   var isLoading = false.obs;
+  var selectedRole = 'JobSeeker'.obs;
   final AuthService _authService = AuthService();
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
@@ -55,6 +58,19 @@ class AuthViewModel extends GetxController {
     }
   }
 
+  Future<void> registerUser(LoginUser user) async {
+    final result = await _authService.registerUser(user);
+    if (result['status']) {
+      // Handle successful registration
+      print(result['message']);
+      SnackbarUtils.showSuccessSnackbar(result['message']);
+    } else {
+      // Handle registration error
+      print(result['message']);
+      SnackbarUtils.showErrorSnackbar(result['message']);
+    }
+  }
+
   Future<void> logout() async {
     try {
       final token = await _authService.getToken();
@@ -67,6 +83,7 @@ class AuthViewModel extends GetxController {
         this.token.value = '';
         userId.value = '';
         role.value = '';
+        await GoogleSignIn().signOut();
       }
     } catch (e) {
       SnackbarUtils.showErrorSnackbar('$e');
@@ -101,6 +118,10 @@ class AuthViewModel extends GetxController {
       print('Error signing in with Google: $e');
       SnackbarUtils.showErrorSnackbar('$e');
     }
+  }
+
+  void setRole(String role) {
+    selectedRole.value = role;
   }
 
 }

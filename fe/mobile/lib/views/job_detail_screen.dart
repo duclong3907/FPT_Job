@@ -26,10 +26,9 @@ class JobDetailScreen extends StatelessWidget {
 
     return Scaffold(
       body: Obx(() {
-        if(jobViewModel.isLoading.value) {
+        if (jobViewModel.isLoading.value) {
           return Center(child: CircularProgressIndicator());
-        }
-        else if (jobViewModel.selectedJob.value == null) {
+        } else if (jobViewModel.selectedJob.value == null) {
           return Center(child: Text('Job not found.'));
         } else {
           final job = jobViewModel.selectedJob.value!;
@@ -93,35 +92,46 @@ class JobMeta extends StatelessWidget {
             contentPadding: const EdgeInsets.all(0),
             leading: job!.employer?.image != null
                 ? CircleAvatar(
-              radius: 30, // Increase the radius to make it larger
-              backgroundImage: MemoryImage(
-                  base64Decode(
-                    job!.employer!.image!
-                        .replaceFirst('data:image/jpeg;base64,', ''),
+                    radius: 30, // Increase the radius to make it larger
+                    backgroundImage: job!.employer!.image!.startsWith('http')
+                        ? NetworkImage(job!.employer!.image!)
+                        : MemoryImage(
+                            base64Decode(
+                              job!.employer!.image!.replaceFirst(
+                                  RegExp(r'data:image/[^;]+;base64,'), ''),
+                            ),
+                          ) as ImageProvider,
                   )
-              ),
-            )
                 : CircleAvatar(
-              radius: 30,
-              child: Icon(Icons.person),
-            ),
+                    radius: 30,
+                    child: Icon(Icons.person),
+                  ),
             title: Text(
                 job?.employer?.fullName != null && job!.employer!.fullName != ''
                     ? job!.employer!.fullName
                     : job?.employer?.user?.email ?? 'Unknown'),
-            subtitle: Text(
-              "${job!.updatedAt != null ? timeAgo(job!.updatedAt!) : 'Unknown date'}",
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (job!.employer!.company != null)
+                  Text(
+                    'Company: ${job!.employer!.company}',
+                  ),
+                Text(
+                  "${job!.updatedAt != null ? timeAgo(job!.updatedAt!) : 'Unknown date'}",
+                ),
+              ],
             ),
             trailing: ElevatedButton(
               onPressed: () {
-                if(authViewModel.isLoggedIn.value) {
-                  if(authViewModel.role.value == 'Admin') {
+                if (authViewModel.isLoggedIn.value) {
+                  if (authViewModel.role.value == 'Admin') {
                     SnackbarUtils.showWarningSnackbar(
                         'Admin cannot apply for a job!');
-                  } else if(authViewModel.role.value == 'Employer') {
+                  } else if (authViewModel.role.value == 'Employer') {
                     SnackbarUtils.showWarningSnackbar(
                         'Employer cannot apply for a job!');
-                  } else{
+                  } else {
                     _showAddApplicationDialog(context);
                   }
                 } else {
@@ -147,11 +157,14 @@ class JobMeta extends StatelessWidget {
   void _showAddApplicationDialog(BuildContext context) {
     final _formKey = GlobalKey<FormState>();
     final TextEditingController _resumeController = TextEditingController();
-    final TextEditingController _coverLetterController = TextEditingController();
-    final TextEditingController _selfIntroductionController = TextEditingController();
+    final TextEditingController _coverLetterController =
+        TextEditingController();
+    final TextEditingController _selfIntroductionController =
+        TextEditingController();
     final TextEditingController _jobIdController = TextEditingController();
     final AuthViewModel authViewModel = Get.find<AuthViewModel>();
-    final ApplicationViewModel _applicationViewModel = Get.find<ApplicationViewModel>();
+    final ApplicationViewModel _applicationViewModel =
+        Get.find<ApplicationViewModel>();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -194,7 +207,6 @@ class JobMeta extends StatelessWidget {
                     return null;
                   },
                 ),
-
               ],
             ),
           ),
@@ -228,7 +240,6 @@ class JobMeta extends StatelessWidget {
       },
     );
   }
-
 }
 
 class JobContent extends StatelessWidget {
@@ -262,36 +273,35 @@ class JobContent extends StatelessWidget {
               Text(
                   'Deadline: ${DateFormat('dd/MM/yyyy').format(job!.applicationDeadline)}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
-                    fontSize: 20,)
-              ),
+                        color: Colors.grey[600],
+                        fontSize: 20,
+                      )),
             ],
           ),
           const SizedBox(height: 16),
           Text(
-            textAlign: TextAlign.justify,
+              textAlign: TextAlign.justify,
               'Skill Requirement: ${job!.skillRequired}',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[600],
-                fontSize: 20,)
-          ),
+                    color: Colors.grey[600],
+                    fontSize: 20,
+                  )),
           const SizedBox(height: 16),
           Text('Salary: \$${job!.salaryRange} / Year',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[600],
-              fontSize: 20,)
-          ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[600],
+                    fontSize: 20,
+                  )),
           const SizedBox(height: 16),
-
           Text('Description', style: TextStyle(fontSize: 20)),
           const SizedBox(height: 16),
           Text(
-            textAlign: TextAlign.justify,
-            stripHtmlTags(job!.description),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[600],
-              fontSize: 16,)
-          ),
+              textAlign: TextAlign.justify,
+              stripHtmlTags(job!.description),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[600],
+                    fontSize: 16,
+                  )),
           const SizedBox(height: 16),
         ],
       ),

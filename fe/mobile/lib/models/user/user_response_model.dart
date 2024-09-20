@@ -10,12 +10,14 @@ class UserResponse {
   List<String> roles;
   String fullName;
   String? image;
+  String? company;
 
   UserResponse({
     required this.user,
     required this.roles,
     required this.fullName,
     this.image,
+    this.company,
   });
 
   factory UserResponse.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,7 @@ class UserResponse {
       roles: (json['roles'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
       fullName: json['fullName'] ?? 'No name', // Handle missing fullName
       image: json['image'], // Handle missing image
+      company: json['company'], // Handle missing company
     );
   }
 

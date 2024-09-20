@@ -21,6 +21,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController companyController = TextEditingController();
 
   @override
   void initState() {
@@ -36,6 +37,9 @@ class _ProfilePageState extends State<ProfilePage> {
         fullNameController.text = user!.fullName ?? '';
         emailController.text = user!.user.email ?? '';
         phoneNumberController.text = user!.user.phoneNumber ?? '';
+        if (user!.roles.contains('Employer')) {
+          companyController.text = user!.company ?? '';
+        }
       }
       setState(() {});
     }
@@ -151,6 +155,11 @@ class _ProfilePageState extends State<ProfilePage> {
                         controller: phoneNumberController,
                         decoration: const InputDecoration(labelText: 'Phone Number'),
                       ),
+                      if (user!.roles.contains('Employer'))
+                        TextFormField(
+                          controller: companyController,
+                          decoration: const InputDecoration(labelText: 'Company Name'),
+                        ),
                       TextFormField(
                         controller: passwordController,
                         decoration: const InputDecoration(labelText: 'Password'),
@@ -168,8 +177,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                 'phoneNumber': phoneNumberController.text,
                                 'role': user!.roles.join(),
                                 'image': user!.image!,
+                                if (user!.roles.contains('Employer'))
+                                  'company': companyController.text,
                                 if (passwordController.text.isNotEmpty)
                                   'password': passwordController.text,
+
                               });
                             }
                           }
