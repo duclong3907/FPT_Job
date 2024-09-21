@@ -6,9 +6,11 @@ import '../config/config_http.dart';
 
 class ApplicationRepository {
   final String baseUrl = baseUrlApi;
+  ApplicationRepository() {
+    HttpOverrides.global = MyHttpOverrides();
+  }
 
   Future<List<Application>> fetchApplications() async {
-    HttpOverrides.global = MyHttpOverrides();
     final response = await http.get(Uri.parse('$baseUrl/Application'));
 
     if (response.statusCode == 200) {
@@ -22,7 +24,6 @@ class ApplicationRepository {
   }
 
   Future<void> addApplication(Map<String, String> requestBody) async {
-    HttpOverrides.global = MyHttpOverrides();
     final url = Uri.parse('$baseUrl/Application');
     final body = json.encode(requestBody);
 
@@ -40,7 +41,6 @@ class ApplicationRepository {
   }
 
   Future<List<Application>> fetchUserApplications(String userId) async {
-    HttpOverrides.global = MyHttpOverrides();
     print('Fetching applications for user: $userId'); // Kiểm tra xem phương thức có được gọi không
     final response = await http.get(Uri.parse('$baseUrl/Application/User/$userId'));
 
@@ -80,7 +80,6 @@ class ApplicationRepository {
   }
 
   Future<void> updateApplication(int applicationId, Map<String, String> requestBody) async {
-    HttpOverrides.global = MyHttpOverrides();
     final url = Uri.parse('$baseUrl/Application/$applicationId');
     final body = json.encode(requestBody);
     final response = await http.put(

@@ -33,8 +33,6 @@ class AuthService {
 
   Future<String?> login(String userName, String password) async {
     final url = Uri.parse('$apiUrl/Login');
-    HttpOverrides.global = MyHttpOverrides();
-
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -83,6 +81,61 @@ class AuthService {
     }
     return true;
   }
+
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+    final url = Uri.parse('$apiUrl/ForgotPassword');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+
+    if (response.statusCode == 200) {
+      return {'status': true, 'message': response.body};
+    } else {
+      return {'status': false, 'message': response.body};
+    }
+  }
+
+  Future<Map<String, dynamic>> checkPhone(String phone) async {
+    final url = Uri.parse('$apiUrl/CheckPhoneNumber');
+    final responseCheckPhone = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'phoneNumber': phone}),
+    );
+    if (responseCheckPhone.statusCode == 200) {
+      return {'status': true, 'message': responseCheckPhone.body};
+    } else {
+      return {'status': false, 'message': jsonDecode(responseCheckPhone.body)['message']};
+    }
+  }
+
+  Future<Map<String, dynamic>> loginWithPhone(String phone) async {
+    final result = await checkPhone(phone);
+    if (result['status']) {
+
+      final url = Uri.parse('$apiUrl/LoginWithPhoneNumber');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'phoneNumber': phone}),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final token = data['token'];
+
+        await secureStorage.write(key: 'token', value: token);
+
+        return {'status': true, 'message': response.body};
+      } else {
+        return {'status': false, 'message': jsonDecode(response.body)['message']};
+      }
+    } else {
+      return {'status': false, 'message': result['message']};
+    }
+  }
+
 
   Future<String?> getToken() async {
     return await secureStorage.read(key: 'token');

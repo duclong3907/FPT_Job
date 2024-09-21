@@ -71,6 +71,19 @@ class AuthViewModel extends GetxController {
     }
   }
 
+  Future<void> forgotPassword(String email) async {
+    final result = await _authService.forgotPassword(email);
+    if (result['status']) {
+      // Handle successful registration
+      print(result['message']);
+      SnackbarUtils.showSuccessSnackbar(result['message']);
+    } else {
+      // Handle registration error
+      print(result['message']);
+      SnackbarUtils.showErrorSnackbar(result['message']);
+    }
+  }
+
   Future<void> logout() async {
     try {
       final token = await _authService.getToken();

@@ -11,10 +11,13 @@ class JobRepository {
   String baseUrl = baseUrlApi;
   final DatabaseHelper _dbHelper = DatabaseHelper();
 
+  JobRepository() {
+    HttpOverrides.global = MyHttpOverrides();
+  }
+
   Future<List<Job>> fetchJobs() async {
     try {
       final url = Uri.parse('$baseUrl/Job');
-      HttpOverrides.global = MyHttpOverrides();
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json; charset=UTF-8',
       });
@@ -37,8 +40,6 @@ class JobRepository {
   Future<Job> fetchJobById(int id) async {
     try {
       final url = Uri.parse('$baseUrl/Job/$id');
-
-      HttpOverrides.global = MyHttpOverrides();
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json; charset=UTF-8',
       });
@@ -88,7 +89,6 @@ class JobRepository {
     try {
       final url = Uri.parse('$baseUrl/Job');
       print('Fetching jobs from: $url');
-      HttpOverrides.global = MyHttpOverrides();
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json; charset=UTF-8',
       });
@@ -110,7 +110,6 @@ class JobRepository {
     try {
       final url = Uri.parse('$baseUrl/Job');
       print('Fetching jobs from: $url');
-      HttpOverrides.global = MyHttpOverrides();
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json; charset=UTF-8',
       });

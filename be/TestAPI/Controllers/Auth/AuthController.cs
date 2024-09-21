@@ -259,7 +259,7 @@ namespace TestAPI.Controllers.Auth
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                return BadRequest("Invalid user");
+                return BadRequest("User doesn't exist in system");
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);

@@ -7,9 +7,12 @@ import '../models/category/job_category_model.dart';
 class JobCategoryRepository {
   final String apiUrl = "$baseUrlApi/Categories";
 
+  JobCategoryRepository() {
+    HttpOverrides.global = MyHttpOverrides();
+  }
+
   Future<List<JobCategory>> fetchJobCategories() async {
     final response = await http.get(Uri.parse(apiUrl));
-    HttpOverrides.global = MyHttpOverrides();
     if (response.statusCode == 200) {
       Map<String, dynamic> body = json.decode(response.body);
       List<dynamic> categoriesJson = body['jobCategories'];

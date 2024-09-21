@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:mobile/view_models/auth_view_model.dart';
 
 import '../../models/auth/login_user_model.dart';
-import '../../utils/snackbar_get.dart';
 
 class RegisterScreen extends StatelessWidget {
   final AuthViewModel authViewModel = Get.put(AuthViewModel());
@@ -13,8 +12,6 @@ class RegisterScreen extends StatelessWidget {
   final _phoneNumberController = TextEditingController();
   final _emailController = TextEditingController();
   final _companyController = TextEditingController();
-
-  String _selectedRole = 'JobSeeker';
   void _register() async {
     await authViewModel.registerUser(
       LoginUser(
@@ -131,7 +128,10 @@ class RegisterScreen extends StatelessWidget {
               )),
           ElevatedButton(
             onPressed: _register,
-            child: const Text('Register'),
+            child: const Text('Register', style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF3157D4),
+            ),
           ),
         ],
       ),

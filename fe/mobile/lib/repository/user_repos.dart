@@ -7,8 +7,11 @@ import '../models/user/user_response_model.dart';
 class UserRepository {
   final String baseUrl = baseUrlApi;
 
-  Future<List<UserResponse>> fetchUsers() async {
+  UserRepository() {
     HttpOverrides.global = MyHttpOverrides();
+  }
+
+  Future<List<UserResponse>> fetchUsers() async {
     final response = await http.get(Uri.parse('$baseUrl/User'));
 
     if (response.statusCode == 200) {
@@ -21,7 +24,6 @@ class UserRepository {
   }
 
   Future<UserResponse> getUser(String id) async {
-    HttpOverrides.global = MyHttpOverrides();
     print('Fetching user data for id $id from $baseUrl/User/$id');
     final response = await http.get(Uri.parse('$baseUrl/User/$id'));
 
@@ -34,7 +36,6 @@ class UserRepository {
   }
 
   Future<void> updateUser(String userId, Map<String, String> requestBody) async {
-    HttpOverrides.global = MyHttpOverrides();
     final url = Uri.parse('$baseUrl/User/$userId');
 
     final body = json.encode(requestBody);
@@ -53,7 +54,6 @@ class UserRepository {
   }
 
   Future<void> deleteUser(String id) async {
-    HttpOverrides.global = MyHttpOverrides();
     final response = await http.delete(Uri.parse('$baseUrl/User/$id'));
 
     if (response.statusCode == 200) {
