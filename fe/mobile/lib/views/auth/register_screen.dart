@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile/view_models/auth_view_model.dart';
-
 import '../../models/auth/login_user_model.dart';
+import '../../utils/validators.dart';
 
 class RegisterScreen extends StatelessWidget {
   final AuthViewModel authViewModel = Get.put(AuthViewModel());
@@ -12,18 +12,22 @@ class RegisterScreen extends StatelessWidget {
   final _phoneNumberController = TextEditingController();
   final _emailController = TextEditingController();
   final _companyController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
   void _register() async {
-    await authViewModel.registerUser(
-      LoginUser(
-        fullName: _fullNameController.text,
-        userName: _emailController.text,
-        password: _passwordController.text,
-        phoneNumber: _phoneNumberController.text,
-        email: _emailController.text,
-        company: _companyController.text,
-        role: authViewModel.selectedRole.value,
-      ),
-    );
+    if (_formKey.currentState!.validate()) {
+      await authViewModel.registerUser(
+        LoginUser(
+          fullName: _fullNameController.text,
+          userName: _emailController.text,
+          password: _passwordController.text,
+          phoneNumber: _phoneNumberController.text,
+          email: _emailController.text,
+          company: _companyController.text,
+          role: authViewModel.selectedRole.value,
+        ),
+      );
+    }
   }
 
   @override
@@ -33,18 +37,17 @@ class RegisterScreen extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildLogo(),
-                const SizedBox(height: 32),
-                _buildEmailPasswordSignIn(),
-                const SizedBox(height: 16),
-                const Text('Or'),
-                const SizedBox(height: 16),
-                _buildGoogleSignInButton(),
-              ],
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildLogo(),
+                  _buildEmailPasswordSignIn(),
+                  _buildGoogleSignInButton(),
+                ],
+              ),
             ),
           ),
         ),
@@ -71,30 +74,71 @@ class RegisterScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          TextField(
+          TextFormField(
             controller: _fullNameController,
-            decoration: const InputDecoration(labelText: 'Full Name'),
+            decoration: const InputDecoration(
+              labelText: 'Full Name',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.person),
+            ),
+            validator: (value) {
+              return Validators.validateFullName(value!);
+            },
           ),
-          TextField(
+          const SizedBox(height: 16),
+          TextFormField(
             controller: _emailController,
-            decoration: const InputDecoration(labelText: 'Email'),
+            decoration: const InputDecoration(
+              labelText: 'Email',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.email),
+            ),
+            validator: (value) {
+              return Validators.validateEmail(value!);
+            },
           ),
-          TextField(
+          const SizedBox(height: 16),
+          TextFormField(
             controller: _phoneNumberController,
-            decoration: const InputDecoration(labelText: 'Phone Number'),
+            decoration: const InputDecoration(
+              labelText: 'Phone Number',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.phone),
+            ),
+            validator: (value) {
+              return Validators.validatePhoneNumber(value!);
+            },
           ),
-          TextField(
+          const SizedBox(height: 16),
+          TextFormField(
             controller: _passwordController,
-            decoration: const InputDecoration(labelText: 'Password'),
+            decoration: const InputDecoration(
+              labelText: 'Password',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.lock),
+            ),
             obscureText: true,
+            validator: (value) {
+              return Validators.validatePassword(value!);
+            },
           ),
           const SizedBox(height: 16),
           Obx(() => Column(
                 children: [
                   if (authViewModel.selectedRole.value == 'Employer') ...[
-                    TextField(
+                    TextFormField(
                       controller: _companyController,
-                      decoration: const InputDecoration(labelText: 'Company'),
+                      decoration: const InputDecoration(
+                        labelText: 'Company',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.business),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Company cannot be empty';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 16),
                   ],
@@ -123,12 +167,12 @@ class RegisterScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
                 ],
               )),
           ElevatedButton(
             onPressed: _register,
-            child: const Text('Register', style: TextStyle(color: Colors.white)),
+            child:
+                const Text('Register', style: TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor: Color(0xFF3157D4),
             ),

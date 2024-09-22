@@ -31,8 +31,7 @@ class LoginScreen extends StatelessWidget {
     await authViewModel.forgotPassword(_emailController.text);
   }
 
-  void _loginWithPhone() async {
-  }
+  void _loginWithPhone() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +51,7 @@ class LoginScreen extends StatelessWidget {
                 const Text('Or'),
                 const SizedBox(height: 16),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -91,11 +90,20 @@ class LoginScreen extends StatelessWidget {
         children: [
           TextField(
             controller: _userNameController,
-            decoration: const InputDecoration(labelText: 'Username'),
+            decoration: const InputDecoration(
+              labelText: 'Email',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.email),
+            ),
           ),
+          const SizedBox(height: 16),
           TextField(
             controller: _passwordController,
-            decoration: const InputDecoration(labelText: 'Password'),
+            decoration: const InputDecoration(
+              labelText: 'Password',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.lock),
+            ),
             obscureText: true,
           ),
           const SizedBox(height: 16),
@@ -103,11 +111,13 @@ class LoginScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
-                child: Text('Forgot password?', style: TextStyle(color: Color(0xFF3157D4))),
+                child: Text('Forgot password?',
+                    style: TextStyle(color: Color(0xFF3157D4))),
                 onTap: _forgotPasswordButton,
               ),
               InkWell(
-                child: Text('Don\'t have an account?', style: TextStyle(color: Color(0xFF3157D4))),
+                child: Text('Don\'t have an account?',
+                    style: TextStyle(color: Color(0xFF3157D4))),
                 onTap: () {
                   Get.toNamed('/register');
                 },
@@ -139,6 +149,11 @@ class LoginScreen extends StatelessWidget {
         filterQuality: FilterQuality.high,
       ),
       label: const Text('Google'),
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ),
     );
   }
 
@@ -147,8 +162,14 @@ class LoginScreen extends StatelessWidget {
       onPressed: _loginPhoneButton,
       icon: Icon(Icons.phone, color: Color(0xFF3157D4)),
       label: const Text('Phone'),
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ),
     );
   }
+
 
   void _loginPhoneButton() {
     showCustomDialog(
@@ -196,6 +217,4 @@ class LoginScreen extends StatelessWidget {
       radius: 10,
     );
   }
-
-
 }

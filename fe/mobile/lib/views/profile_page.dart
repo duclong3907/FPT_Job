@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import '../utils/validators.dart';
 import '../view_models/auth_view_model.dart';
 import '../view_models/user_view_model.dart';
 import '../models/user/user_response_model.dart';
@@ -65,6 +66,25 @@ class _ProfilePageState extends State<ProfilePage> {
     phoneNumberController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  void _updateProfile() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      if (user != null) {
+        await userViewModel.updateUser(user!.user.id, {
+          'fullName': fullNameController.text,
+          'userName': user!.user.userName,
+          'email': emailController.text,
+          'phoneNumber': phoneNumberController.text,
+          'role': user!.roles.join(),
+          'image': user!.image!,
+          if (user!.roles.contains('Employer'))
+            'company': companyController.text,
+          if (passwordController.text.isNotEmpty)
+            'password': passwordController.text,
+        });
+      }
+    }
   }
 
   @override
@@ -143,49 +163,70 @@ class _ProfilePageState extends State<ProfilePage> {
                         user!.roles.join() ?? '',
                         style: const TextStyle(fontSize: 20),
                       ),
+                      const SizedBox(height: 16),
                       TextFormField(
                         controller: fullNameController,
-                        decoration: const InputDecoration(labelText: 'Full Name'),
+                        decoration: const InputDecoration(
+                          labelText: 'Full Name',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.person),
+                        ),
+                        validator: (value) {
+                          return Validators.validateFullName(value!);
+                        },
                       ),
+                      const SizedBox(height: 16),
                       TextFormField(
                         controller: emailController,
-                        decoration: const InputDecoration(labelText: 'Email'),
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.email),
+                        ),
                       ),
+                      const SizedBox(height: 16),
                       TextFormField(
                         controller: phoneNumberController,
-                        decoration: const InputDecoration(labelText: 'Phone Number'),
+                        decoration: const InputDecoration(
+                          labelText: 'Phone Number',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.phone),
+                        ),
+                        validator: (value) {
+                          return Validators.validatePhoneNumber(value!);
+                        },
                       ),
                       if (user!.roles.contains('Employer'))
-                        TextFormField(
-                          controller: companyController,
-                          decoration: const InputDecoration(labelText: 'Company Name'),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: TextFormField(
+                            controller: companyController,
+                            decoration: const InputDecoration(
+                              labelText: 'Company',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.business),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Company cannot be empty';
+                              }
+                              return null;
+                            },
+                          ),
                         ),
+                      const SizedBox(height: 16),
                       TextFormField(
                         controller: passwordController,
-                        decoration: const InputDecoration(labelText: 'Password'),
+                        decoration: const InputDecoration(
+                          labelText: 'Password',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.lock),
+                        ),
                         obscureText: true,
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState?.validate() ?? false) {
-                            if (user != null) {
-                              await userViewModel.updateUser(user!.user.id, {
-                                'fullName': fullNameController.text,
-                                'userName': user!.user.userName,
-                                'email': emailController.text,
-                                'phoneNumber': phoneNumberController.text,
-                                'role': user!.roles.join(),
-                                'image': user!.image!,
-                                if (user!.roles.contains('Employer'))
-                                  'company': companyController.text,
-                                if (passwordController.text.isNotEmpty)
-                                  'password': passwordController.text,
-
-                              });
-                            }
-                          }
-                        },
+                        onPressed: _updateProfile,
                         child: const Text('Update Profile'),
                       ),
                     ],
