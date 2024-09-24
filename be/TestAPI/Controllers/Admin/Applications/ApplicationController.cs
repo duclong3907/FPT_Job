@@ -81,7 +81,7 @@ namespace TestAPI.Controllers.Admin.Applications
                 await _context.Applications.AddAsync(newApplication);
                 await _context.SaveChangesAsync();
 
-                await _hubContext.Clients.All.SendAsync("createdApplication", newApplication);
+                await _hubContext.Clients.All.SendAsync("createdApplication", newApplication.JobId, newApplication);
                 return Ok(new { message = "Application created successfully" });
             }
             catch (Exception ex)
@@ -108,7 +108,7 @@ namespace TestAPI.Controllers.Admin.Applications
 
                 await _context.SaveChangesAsync();
 
-                await _hubContext.Clients.All.SendAsync("updatedApplication", applicationToUpdate);
+                await _hubContext.Clients.All.SendAsync("updatedApplication", applicationToUpdate.JobId, applicationToUpdate);
                 return Ok(new { message = "Application updated successfully" });
             }
             catch (Exception ex)
@@ -128,7 +128,7 @@ namespace TestAPI.Controllers.Admin.Applications
                 _context.Applications.Remove(applicationToDelete);
                 await _context.SaveChangesAsync();
 
-                await _hubContext.Clients.All.SendAsync("deletedApplication", applicationToDelete);
+                await _hubContext.Clients.All.SendAsync("deletedApplication", applicationToDelete.JobId, applicationToDelete);
                 return Ok(new { message = "Application deleted successfully" });
             }
             catch (Exception ex)

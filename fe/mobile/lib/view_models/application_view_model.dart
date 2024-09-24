@@ -44,6 +44,7 @@ class ApplicationViewModel extends GetxController {
 
   Future<void> fetchUserApplications(String userId) async {
     isLoading.value = true;
+    userAppliedJobIds.clear();
     try {
       print('Fetching applications for user: $userId');
       final fetchedApplications = await _applicationRepository.fetchUserApplications(userId);
@@ -61,12 +62,13 @@ class ApplicationViewModel extends GetxController {
 
   Future<void> fetchApplicationsForJob(int jobId) async {
     isLoading.value = true;
+    jobApplications.clear();
     try {
       var applications = await _applicationRepository.fetchApplicationsForJob(jobId);
-      jobApplications.assignAll(applications);
+      jobApplications.assignAll(applications.where((app) => app.jobId == jobId).toList());
+
     } catch (e) {
-      print(e);
-      // SnackbarUtils.showErrorSnackbar('$e');
+      print('Error fetching applications for job $jobId: $e');
     } finally {
       isLoading.value = false;
     }
@@ -79,7 +81,7 @@ class ApplicationViewModel extends GetxController {
       if (index != -1) {
         jobApplications[index].status = requestBody['status']!;
       }
-      SnackbarUtils.showSuccessSnackbar('Updated successfully!');
+      // SnackbarUtils.showSuccessSnackbar('Updated successfully!');
     } catch (e) {
       print('Error updating application: $e');
       SnackbarUtils.showErrorSnackbar('$e');

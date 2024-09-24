@@ -3,10 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/application/application_model.dart';
+import '../services/signalr_service.dart';
 import '../view_models/application_view_model.dart';
 
 final ApplicationViewModel applicationViewModel =
     Get.find<ApplicationViewModel>();
+final SignalRService signalRService = Get.find<SignalRService>();
+
+
 
 class JobApplicationsPage extends StatelessWidget {
   final int jobId;
@@ -15,16 +19,25 @@ class JobApplicationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     applicationViewModel.fetchApplicationsForJob(jobId);
+    signalRService.refreshJobApplications.listen((refreshData) {
+      final jobIdToRefresh = refreshData['jobId'];
+      final shouldRefresh = refreshData['refresh'] == true;
+
+      if (jobIdToRefresh != null && jobIdToRefresh == jobId && shouldRefresh) {
+        applicationViewModel.fetchApplicationsForJob(jobId);
+        signalRService.refreshJobApplications.value = {'jobId': null, 'refresh': false};
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Job Applications'),
+        title: const Text('Job Applications'),
       ),
-      body: Obx(() {
+      body:  Obx(() {
         if (applicationViewModel.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (applicationViewModel.jobApplications.isEmpty) {
-          return Center(child: Text('No applications found.'));
+          return const Center(child: Text('No applications found.'));
         } else {
           return ListView.builder(
             itemCount: applicationViewModel.jobApplications.length,
@@ -34,18 +47,20 @@ class JobApplicationsPage extends StatelessWidget {
                 child: ListTile(
                   leading: application.image != null
                       ? CircleAvatar(
-                          radius: 30,
-                          backgroundImage: MemoryImage(
-                            base64Decode(
-                              application.image!
-                                  .replaceFirst('data:image/jpeg;base64,', ''),
-                            ),
-                          ),
-                        )
-                      : const CircleAvatar(
-                          radius: 30,
-                          child: Icon(Icons.person),
-                        ),
+                    radius: 30,
+                    backgroundImage:  application.image!.startsWith('http')
+                        ? NetworkImage(application.image!)
+                        : MemoryImage(
+                      base64Decode(
+                        application.image!.replaceFirst(
+                            RegExp(r'data:image/[^;]+;base64,'), ''),
+                      ),
+                    ) as ImageProvider,
+                  )
+                      : CircleAvatar(
+                    radius: 30,
+                    child: Icon(Icons.person),
+                  ),
                   title: Text(application.fullName ?? 'No Name'),
                   subtitle: Text(application.userEmail ?? 'No Email'),
                 ),
@@ -74,12 +89,14 @@ class _ShowDetail extends StatelessWidget {
             if (application.image != null)
               CircleAvatar(
                 radius: 70,
-                backgroundImage: MemoryImage(
-                  base64Decode(
-                    application.image!
-                        .replaceFirst('data:image/jpeg;base64,', ''),
-                  ),
-                ),
+                backgroundImage: application.image!.startsWith('http')
+                    ? NetworkImage(application.image!)
+                    : MemoryImage(
+                        base64Decode(
+                          application.image!.replaceFirst(
+                              RegExp(r'data:image/[^;]+;base64,'), ''),
+                        ),
+                      ) as ImageProvider,
               )
             else
               const CircleAvatar(
@@ -161,13 +178,13 @@ class _ShowDetail extends StatelessWidget {
                             status == 'pending'
                                 ? Icons.pending_actions
                                 : status == 'accepted'
-                                ? Icons.check_circle
-                                : Icons.cancel,
+                                    ? Icons.check_circle
+                                    : Icons.cancel,
                             color: status == 'pending'
                                 ? Colors.orange
                                 : status == 'accepted'
-                                ? Colors.green
-                                : Colors.red,
+                                    ? Colors.green
+                                    : Colors.red,
                           ),
                         ],
                       ),

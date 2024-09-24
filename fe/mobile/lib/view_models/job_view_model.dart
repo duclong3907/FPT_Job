@@ -19,9 +19,9 @@ class JobViewModel extends GetxController {
 
   @override
   void onInit() {
-    fetchJobs();
     // fetchJobsPostByEmployer(Get.find<AuthViewModel>().userId.value);
     super.onInit();
+    fetchJobs();
   }
 
   Future<void> fetchJobs() async {

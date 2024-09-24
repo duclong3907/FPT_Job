@@ -58,7 +58,16 @@ class _FavoriteJobsPageState extends State<FavoriteJobsPage> {
             Obx(() {
               if(authViewModel.role.value == 'JobSeeker'){
                 if (applicationViewModel.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                  return FutureBuilder(
+                    future: Future.delayed(Duration(seconds: 2)),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else {
+                        return Center(child: Text('No applications found.'));
+                      }
+                    },
+                  );
                 } else {
                   final appliedJobs = jobViewModel.jobs.where((job) => applicationViewModel.userAppliedJobIds.contains(job.id)).toList();
                   if (appliedJobs.isEmpty) {
