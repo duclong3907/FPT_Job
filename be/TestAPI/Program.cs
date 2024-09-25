@@ -1,13 +1,23 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TestAPI.Contextes;
+using TestAPI.Repository;
+using TestAPI.Repository.AuthRepo;
 using TestAPI.Services;
 using TestAPI.Services.Email;
 using TestAPI.Services.HubService;
 using TestAPI.Services.Token;
+using AppAPI.Repository;
+using TestAPI.Repository.UserRepo;
+using TestAPI.Repository.CategoryRepo;
+using TestAPI.Repository.JobRepo;
+using TestAPI.Repository.ApplicationRepo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,6 +81,23 @@ builder.Services.AddAuthentication(options =>
     facebookOptions.AppSecret = facebookAuthNSection["AppSecret"];
     facebookOptions.CallbackPath = "/signin-facebook";
 });
+
+// Register repositories
+builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
+builder.Services.AddScoped<IUrlHelper>(provider =>
+{
+var actionContext = provider.GetRequiredService<IActionContextAccessor>().ActionContext;
+return provider.GetRequiredService<IUrlHelperFactory>().GetUrlHelper(actionContext);
+});
+//builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IJobRepository, JobRepository>();
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+
 
 // Add services to the container.
 builder.Services.AddTransient<IAuthService, AuthService>();

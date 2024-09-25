@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using TestAPI.Contextes;
+﻿using Microsoft.AspNetCore.Mvc;
 using TestAPI.Models;
-using TestAPI.Services.HubService;
+using TestAPI.Repository.CategoryRepo;
 
 namespace TestAPI.Controllers.Admin.Categories
 {
@@ -12,13 +8,10 @@ namespace TestAPI.Controllers.Admin.Categories
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly AuthDemoDbContext _context;
-
-        private readonly IHubContext<ServiceHub> _hubContext;
-        public CategoriesController(AuthDemoDbContext context, IHubContext<ServiceHub> hubContext)
+        private readonly ICategoryRepository _jobCategories;
+        public CategoriesController(ICategoryRepository jobCategories)
         {
-            _context = context;
-            _hubContext = hubContext;
+            _jobCategories = jobCategories;
         }
 
         [HttpGet]
@@ -26,7 +19,7 @@ namespace TestAPI.Controllers.Admin.Categories
         {
             try
             {
-                var jobCategories = await _context.JobCategories.ToListAsync();
+                var jobCategories = await _jobCategories.GetAll();
                 if (jobCategories is null) return NotFound(new { message = "No data" });
 
                 return Ok(new { jobCategories, message = "Retrieve successfully" });
@@ -42,7 +35,7 @@ namespace TestAPI.Controllers.Admin.Categories
         {
             try
             {
-                var jobCategoies = await _context.JobCategories.FirstOrDefaultAsync(j => j.Id == id);
+                var jobCategoies = await _jobCategories.GetById(id);
                 if (jobCategoies == null) return NotFound(new { message = "Id not found" });
                 return Ok(jobCategoies);
             }
@@ -57,16 +50,7 @@ namespace TestAPI.Controllers.Admin.Categories
         {
             try
             {
-                var newCategory = new JobCategories
-                {
-                    Name = category.Name
-                };
-                if (newCategory is null) return BadRequest(new { employee = newCategory, message = "Retrieve successfully" });
-                _context.JobCategories.Add(newCategory);
-                await _context.SaveChangesAsync();
-
-                await _hubContext.Clients.All.SendAsync("createdCategory", newCategory);
-                return Ok(new { category = newCategory, message = "Create category successfully" });
+                return await _jobCategories.CreateCategoryAsync(category);
             }
             catch (Exception ex)
             {
@@ -79,16 +63,7 @@ namespace TestAPI.Controllers.Admin.Categories
         {
             try
             {
-                var categoryUpdate = _context.JobCategories.Find(id);
-                if (categoryUpdate == null)
-                {
-                    return NotFound(new { message = "Id not found" });
-                }
-                categoryUpdate.Name = category.Name;
-                await _context.SaveChangesAsync();
-
-                await _hubContext.Clients.All.SendAsync("updatedCategory", categoryUpdate);
-                return Ok(new { message = "Update category successfully" });
+                return await _jobCategories.UpdateCategoryAsync(id, category);
             }
             catch (Exception ex)
             {
@@ -101,25 +76,7 @@ namespace TestAPI.Controllers.Admin.Categories
         {
             try
             {
-                var category = _context.JobCategories.Find(id);
-                if (category == null) return NotFound(new { message = "Id not found" });
-
-                var relatedJobs = await _context.Jobs.Where(j => j.JobCategoryId == id).ToListAsync();
-                // ktra xem tk con đã xoá mềm hay chưa
-                if (relatedJobs.Any(j => j.Deleted == 0))
-                {
-                    return BadRequest(new { message = "Can't delete category because it has related jobs that are not deleted" });
-                }
-                // nếu tk con đã xoá mềm rồi thì thực hiện xoá cứng tk con và tk cha
-                foreach (var job in relatedJobs)
-                {
-                    _context.Jobs.Remove(job);
-                }
-                _context.JobCategories.Remove(category);
-                _context.SaveChanges();
-
-                await _hubContext.Clients.All.SendAsync("deletedCategory", category);
-                return Ok(new { message = "Delete category successfully" });
+                return await _jobCategories.DeleteCategoryAsync(id);
             }
             catch (Exception ex)
             {

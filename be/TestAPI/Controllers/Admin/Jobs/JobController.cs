@@ -1,12 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
-using TestAPI.Contextes;
+﻿using Microsoft.AspNetCore.Mvc;
 using TestAPI.Models;
-using TestAPI.Services.HubService;
+using TestAPI.Repository.JobRepo;
+
 
 namespace TestAPI.Controllers.Admin.Jobs
 {
@@ -15,26 +10,23 @@ namespace TestAPI.Controllers.Admin.Jobs
     //[Authorize(Roles="Admin")]
     public class JobController : ControllerBase
     {
-        private readonly AuthDemoDbContext _context;
-        private readonly IHubContext<ServiceHub> _hubContext;
-        public JobController(AuthDemoDbContext context, IHubContext<ServiceHub> hubContext)
+        private readonly IJobRepository _job;
+        public JobController(IJobRepository job)
         {
-            _context = context;
-            _hubContext = hubContext;
+            _job = job;
         }
         [HttpGet]
         public async Task<IActionResult> Get()
         {
             try
             {
-                var jobs = await _context.Jobs.Where(j => j.Deleted == 0).ToListAsync();
-                if (jobs is null || !jobs.Any()) return NotFound(new { message = "No data" });
+                var jobs = await _job.GetAllNotSoftDeleted();
+                if (jobs is null) return NotFound(new { message = "No data" });
 
                 return Ok(new { jobs, message = "Retrieve successfully" });
             }
             catch (Exception ex)
             {
-                // Log the exception if you have a logging system
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving jobs" });
             }
         }
@@ -45,7 +37,8 @@ namespace TestAPI.Controllers.Admin.Jobs
         {
             try
             {
-                var job = await _context.Jobs.FirstOrDefaultAsync(j => j.Id == id && j.Deleted == 0);
+                //var job = await _context.Jobs.FirstOrDefaultAsync(j => j.Id == id && j.Deleted == 0);
+                var job = await _job.GetByNotSoftDeletedId(id);
                 if (job == null) return NotFound(new { message = "Id not found" });
                 return Ok(job);
             }
@@ -61,28 +54,7 @@ namespace TestAPI.Controllers.Admin.Jobs
         {
             try
             {
-                var newJob = new Job
-                {
-                    Title = job.Title,
-                    Image = job.Image,
-                    Description = job.Description,
-                    SalaryRange = job.SalaryRange,
-                    Experience_required = job.Experience_required,
-                    Education_required = job.Education_required,
-                    Skill_required = job.Skill_required,
-                    Application_deadline = job.Application_deadline,
-                    status = "open",
-                    EmployerId = job.EmployerId,
-                    JobCategoryId = job.JobCategoryId,
-                    Created_At = DateTime.Now,
-                    Updated_At = DateTime.Now,
-                    Deleted = 0
-                };
-                _context.Jobs.Add(newJob);
-                await _context.SaveChangesAsync();
-
-                await _hubContext.Clients.All.SendAsync("createdJob", newJob);
-                return Ok(new { job = newJob, message = "Create job successfully" });
+                return await _job.CreateJobAsync(job);
             }
             catch (Exception ex)
             {
@@ -95,25 +67,7 @@ namespace TestAPI.Controllers.Admin.Jobs
         {
             try
             {
-                var jobUpdate = await _context.Jobs.FirstOrDefaultAsync(j => j.Id == id && j.Deleted == 0);
-                if (jobUpdate == null) return NotFound(new { message = "Id not found" });
-
-                jobUpdate.Title = job.Title;
-                jobUpdate.Image = job.Image;
-                jobUpdate.Description = job.Description;
-                jobUpdate.SalaryRange = job.SalaryRange;
-                jobUpdate.Experience_required = job.Experience_required;
-                jobUpdate.Education_required = job.Education_required;
-                jobUpdate.Skill_required = job.Skill_required;
-                jobUpdate.Application_deadline = job.Application_deadline;
-                jobUpdate.status = job.status;
-                jobUpdate.EmployerId = job.EmployerId;
-                jobUpdate.JobCategoryId = job.JobCategoryId;
-                jobUpdate.Updated_At = DateTime.Now;
-                await _context.SaveChangesAsync();
-
-                await _hubContext.Clients.All.SendAsync("updatedJob", jobUpdate);
-                return Ok(new { message = "Update category successfully" });
+                return await _job.UpdateJobAsync(id, job);
             }
             catch (Exception ex)
             {
@@ -127,21 +81,7 @@ namespace TestAPI.Controllers.Admin.Jobs
         {
             try
             {
-                var jobUpdate = await _context.Jobs.FirstOrDefaultAsync(j => j.Id == id && j.Deleted == 0);
-                if (jobUpdate == null) return NotFound(new { message = "Id not found" });
-
-                var relatedApplications = await _context.Applications.AnyAsync(a => a.JobId == id);
-
-                if (relatedApplications)
-                {
-                    return BadRequest(new { message = "Please delete related applications before deleting this job." });
-                }
-
-                jobUpdate.Deleted = 1;
-                _context.SaveChanges();
-
-                await _hubContext.Clients.All.SendAsync("deletedJob", jobUpdate);
-                return Ok(new { message = "Delete category successfully" });
+                return await _job.DeleteJobAsync(id);
             }
             catch (Exception ex)
             {
@@ -154,39 +94,7 @@ namespace TestAPI.Controllers.Admin.Jobs
         {
             try
             {
-                var applications = await _context.Applications
-                    .Where(app => app.JobId == jobId)
-                    .Join(_context.Users,
-                          app => app.UserId,
-                          user => user.Id,
-                          (app, user) => new { app, user })
-                    .Join(_context.UserInfos,
-                          combined => combined.user.Id,
-                          userInfo => userInfo.UserId,
-                          (combined, userInfo) => new
-                          {
-                              Id = combined.app.Id,
-                              UserId = combined.user.Id,
-                              UserName = combined.user.UserName,
-                              FullName = userInfo.FullName,
-                              JobId = jobId,
-                              Image = userInfo.Image,
-                              UserEmail = combined.user.Email,
-                              Status = combined.app.status,
-                              Resume = combined.app.resume,
-                              CoverLetter = combined.app.coverLetter,
-                              SelfIntroduction = combined.app.selfIntroduction,
-                              ApplicationStatus = combined.app.status,
-                              AppliedDate = combined.app.Created_At
-                          })
-                    .ToListAsync();
-
-                if (applications == null || !applications.Any())
-                {
-                    return NotFound(new { message = "No applications found for this job" });
-                }
-
-                return Ok(new { applications, message = "Retrieve successfully" });
+                return await _job.GetApplicationsForJob(jobId);
             }
             catch (Exception ex)
             {
