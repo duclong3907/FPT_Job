@@ -22,7 +22,7 @@ class SignalRService extends GetxService {
 
   Future<void> _startConnection() async {
     _hubConnection = HubConnectionBuilder()
-        .withUrl('https://192.168.100.7:5001/serviceHub')
+        .withUrl('https://192.168.1.6:5001/serviceHub')
         .build();
 
     _hubConnection.onclose((error) {

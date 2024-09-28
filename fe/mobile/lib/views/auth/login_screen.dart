@@ -9,6 +9,7 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final ValueNotifier<bool> _isPasswordVisible = ValueNotifier<bool>(false);
 
   void _login() async {
     final userName = _userNameController.text;
@@ -97,14 +98,35 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          TextField(
-            controller: _passwordController,
-            decoration: const InputDecoration(
-              labelText: 'Password',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.lock),
-            ),
-            obscureText: true,
+          ValueListenableBuilder<bool>(
+            valueListenable: _isPasswordVisible,
+            builder: (context, isPasswordVisible, child) {
+              return TextFormField(
+                controller: _passwordController,
+                keyboardType: TextInputType.visiblePassword,
+                obscureText: !isPasswordVisible,
+                decoration: InputDecoration(
+                  hintText: 'Password',
+                  labelText: 'Password',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      _isPasswordVisible.value = !isPasswordVisible;
+                    },
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  return null;
+                },
+              );
+            },
           ),
           const SizedBox(height: 16),
           Row(
@@ -169,7 +191,6 @@ class LoginScreen extends StatelessWidget {
       ),
     );
   }
-
 
   void _loginPhoneButton() {
     showCustomDialog(

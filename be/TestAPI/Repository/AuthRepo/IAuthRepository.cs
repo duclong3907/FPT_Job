@@ -17,5 +17,6 @@ namespace TestAPI.Repository.AuthRepo
         Task<IActionResult> ForgotPasswordAsync(ForgotPassword model, IUrlHelper urlHelper, HttpRequest request);
         Task<IActionResult> ResetPasswordAsync(string id, ResetPasswordModel model);
         Task<IActionResult> LoginOTPEmailAsync(VerifyUser userFA);
+        Task<bool> ConfirmEmailAsync(string userName, string token);
     }
 }

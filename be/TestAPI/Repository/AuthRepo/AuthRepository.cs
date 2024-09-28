@@ -12,6 +12,10 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Net;
+using Azure.Core;
+using System.Security.Policy;
+using TestAPI.Controllers.Auth;
+
 
 namespace TestAPI.Repository.AuthRepo
 {
@@ -147,26 +151,36 @@ namespace TestAPI.Repository.AuthRepo
                 throw new InvalidOperationException("HTTP request is not available");
             }
 
-            var emailConfirmationLink = _urlHelper.Action(nameof(ConfirmEmail), "Auth", new { userName = encodedUserName, token = emailConfirmationToken }, request.Scheme);
+            var emailConfirmationLink = _urlHelper.Action(
+               nameof(AuthController.ConfirmEmail),
+               "Auth",
+               new { userName = encodedUserName, token = emailConfirmationToken },
+               request.Scheme
+           );
 
             string emailSubject = "Confirm your email";
-            string emailContent = $"<h1>Welcome to our application!</h1><p>Thank you for registering. Please click the following <a href='{emailConfirmationLink}'>Click Here</a> to confirm your account...";
+            string emailContent = $"<h1>Welcome to our application!</h1><p>Thank you for registering. Please click the following <a href='{emailConfirmationLink}'>Click Here</a> to confirm your account...</p>";
 
             await _emailService.SendEmailAsync(userName, emailSubject, emailContent);
         }
 
-        public async Task<IActionResult> ConfirmEmail(string userName, string token)
+
+
+        public async Task<bool> ConfirmEmailAsync(string userName, string token)
         {
             // Decode the userName
             var base64EncodedBytes = Convert.FromBase64String(userName);
             var decodedUserName = Encoding.UTF8.GetString(base64EncodedBytes);
 
-            var result = await _authService.ConfirmEmailAsync(decodedUserName, token);
-            if (result)
+            // Confirm the email
+            var user = await _userManager.FindByNameAsync(decodedUserName);
+            if (user == null)
             {
-                return new RedirectResult("http://localhost:3000/signin?confirmEmail=true");
+                return false;
             }
-            return new BadRequestObjectResult("Error confirming email");
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            return result.Succeeded;
         }
 
 

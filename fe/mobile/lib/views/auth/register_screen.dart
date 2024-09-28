@@ -13,6 +13,7 @@ class RegisterScreen extends StatelessWidget {
   final _emailController = TextEditingController();
   final _companyController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final ValueNotifier<bool> _isPasswordVisible = ValueNotifier<bool>(false);
 
   void _register() async {
     if (_formKey.currentState!.validate()) {
@@ -110,18 +111,34 @@ class RegisterScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 16),
-          TextFormField(
-            controller: _passwordController,
-            decoration: const InputDecoration(
-              labelText: 'Password',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.lock),
-            ),
-            obscureText: true,
-            validator: (value) {
-              return Validators.validatePassword(value!);
+          ValueListenableBuilder<bool>(
+            valueListenable: _isPasswordVisible,
+            builder: (context, isPasswordVisible, child) {
+              return TextFormField(
+                controller: _passwordController,
+                keyboardType: TextInputType.visiblePassword,
+                obscureText: !isPasswordVisible,
+                decoration: InputDecoration(
+                  hintText: 'Password',
+                  labelText: 'Password',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      _isPasswordVisible.value = !isPasswordVisible;
+                    },
+                  ),
+                ),
+                validator: (value) {
+                  return Validators.validatePassword(value!);
+                },
+              );
             },
           ),
+
           const SizedBox(height: 16),
           Obx(() => Column(
                 children: [

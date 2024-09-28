@@ -6,25 +6,25 @@ import '../models/application/application_model.dart';
 import '../services/signalr_service.dart';
 import '../view_models/application_view_model.dart';
 
-final ApplicationViewModel applicationViewModel =
-    Get.find<ApplicationViewModel>();
+final ApplicationViewModel applicationViewModel = Get.find<ApplicationViewModel>();
 final SignalRService signalRService = Get.find<SignalRService>();
-
-
 
 class JobApplicationsPage extends StatelessWidget {
   final int jobId;
-  JobApplicationsPage({required this.jobId});
+  final ValueNotifier<List<Application>> jobApplicationsNotifier;
+
+  JobApplicationsPage({required this.jobId})
+      : jobApplicationsNotifier = ValueNotifier(applicationViewModel.jobApplications);
 
   @override
   Widget build(BuildContext context) {
-    applicationViewModel.fetchApplicationsForJob(jobId);
+    _fetchApplications();
     signalRService.refreshJobApplications.listen((refreshData) {
       final jobIdToRefresh = refreshData['jobId'];
       final shouldRefresh = refreshData['refresh'] == true;
 
       if (jobIdToRefresh != null && jobIdToRefresh == jobId && shouldRefresh) {
-        applicationViewModel.fetchApplicationsForJob(jobId);
+        _fetchApplications();
         signalRService.refreshJobApplications.value = {'jobId': null, 'refresh': false};
       }
     });
@@ -33,44 +33,52 @@ class JobApplicationsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Job Applications'),
       ),
-      body:  Obx(() {
-        if (applicationViewModel.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (applicationViewModel.jobApplications.isEmpty) {
-          return const Center(child: Text('No applications found.'));
-        } else {
-          return ListView.builder(
-            itemCount: applicationViewModel.jobApplications.length,
-            itemBuilder: (context, index) {
-              final application = applicationViewModel.jobApplications[index];
-              return InkWell(
-                child: ListTile(
-                  leading: application.image != null
-                      ? CircleAvatar(
-                    radius: 30,
-                    backgroundImage:  application.image!.startsWith('http')
-                        ? NetworkImage(application.image!)
-                        : MemoryImage(
-                      base64Decode(
-                        application.image!.replaceFirst(
-                            RegExp(r'data:image/[^;]+;base64,'), ''),
-                      ),
-                    ) as ImageProvider,
-                  )
-                      : CircleAvatar(
-                    radius: 30,
-                    child: Icon(Icons.person),
+      body: ValueListenableBuilder<List<Application>>(
+        valueListenable: jobApplicationsNotifier,
+        builder: (context, jobApplications, child) {
+          if (applicationViewModel.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (jobApplications.isEmpty) {
+            return const Center(child: Text('No applications found.'));
+          } else {
+            return ListView.builder(
+              itemCount: jobApplications.length,
+              itemBuilder: (context, index) {
+                final application = jobApplications[index];
+                return InkWell(
+                  child: ListTile(
+                    leading: application.image != null
+                        ? CircleAvatar(
+                      radius: 30,
+                      backgroundImage: application.image!.startsWith('http')
+                          ? NetworkImage(application.image!)
+                          : MemoryImage(
+                        base64Decode(
+                          application.image!.replaceFirst(
+                              RegExp(r'data:image/[^;]+;base64,'), ''),
+                        ),
+                      ) as ImageProvider,
+                    )
+                        : CircleAvatar(
+                      radius: 30,
+                      child: Icon(Icons.person),
+                    ),
+                    title: Text(application.fullName ?? 'No Name'),
+                    subtitle: Text(application.userEmail ?? 'No Email'),
                   ),
-                  title: Text(application.fullName ?? 'No Name'),
-                  subtitle: Text(application.userEmail ?? 'No Email'),
-                ),
-                onTap: () => Get.dialog(_ShowDetail(application: application)),
-              );
-            },
-          );
-        }
-      }),
+                  onTap: () => Get.dialog(_ShowDetail(application: application)),
+                );
+              },
+            );
+          }
+        },
+      ),
     );
+  }
+
+  void _fetchApplications() async {
+    await applicationViewModel.fetchApplicationsForJob(jobId);
+    jobApplicationsNotifier.value = applicationViewModel.jobApplications;
   }
 }
 
@@ -92,11 +100,11 @@ class _ShowDetail extends StatelessWidget {
                 backgroundImage: application.image!.startsWith('http')
                     ? NetworkImage(application.image!)
                     : MemoryImage(
-                        base64Decode(
-                          application.image!.replaceFirst(
-                              RegExp(r'data:image/[^;]+;base64,'), ''),
-                        ),
-                      ) as ImageProvider,
+                  base64Decode(
+                    application.image!.replaceFirst(
+                        RegExp(r'data:image/[^;]+;base64,'), ''),
+                  ),
+                ) as ImageProvider,
               )
             else
               const CircleAvatar(
@@ -106,24 +114,21 @@ class _ShowDetail extends StatelessWidget {
             const SizedBox(height: 10),
             Row(
               children: [
-                const Text('Name: ',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Name: ', style: TextStyle(fontWeight: FontWeight.bold)),
                 Text(application.fullName ?? 'No Name'),
               ],
             ),
             const SizedBox(height: 10),
             Row(
               children: [
-                const Text('Email: ',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Email: ', style: TextStyle(fontWeight: FontWeight.bold)),
                 Text(application.userEmail ?? 'No Email'),
               ],
             ),
             const SizedBox(height: 10),
             Row(
               children: [
-                const Text('Resume: ',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Resume: ', style: TextStyle(fontWeight: FontWeight.bold)),
                 Expanded(
                   child: Text(
                     application.resume,
@@ -136,8 +141,7 @@ class _ShowDetail extends StatelessWidget {
             const SizedBox(height: 10),
             Row(
               children: [
-                const Text('Cover Letter: ',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Cover Letter: ', style: TextStyle(fontWeight: FontWeight.bold)),
                 Expanded(
                   child: Text(
                     application.coverLetter ?? 'No Cover Letter',
@@ -150,8 +154,7 @@ class _ShowDetail extends StatelessWidget {
             const SizedBox(height: 10),
             Row(
               children: [
-                const Text('Self Introduction: ',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Self Introduction: ', style: TextStyle(fontWeight: FontWeight.bold)),
                 Expanded(
                   child: Text(
                     application.selfIntroduction ?? 'No Self Introduction',
@@ -164,8 +167,7 @@ class _ShowDetail extends StatelessWidget {
             const SizedBox(height: 10),
             Row(
               children: [
-                const Text('Status: ',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Status: ', style: TextStyle(fontWeight: FontWeight.bold)),
                 ValueListenableBuilder<String>(
                   valueListenable: statusNotifier,
                   builder: (context, status, child) {
@@ -178,13 +180,13 @@ class _ShowDetail extends StatelessWidget {
                             status == 'pending'
                                 ? Icons.pending_actions
                                 : status == 'accepted'
-                                    ? Icons.check_circle
-                                    : Icons.cancel,
+                                ? Icons.check_circle
+                                : Icons.cancel,
                             color: status == 'pending'
                                 ? Colors.orange
                                 : status == 'accepted'
-                                    ? Colors.green
-                                    : Colors.red,
+                                ? Colors.green
+                                : Colors.red,
                           ),
                         ],
                       ),

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text;
 using TestAPI.Models.Auth;
 using TestAPI.Repository.AuthRepo;
 
@@ -49,6 +50,18 @@ namespace TestAPI.Controllers.Auth
             }
             return BadRequest(new { status = false, message = ErrorMessage });
         }
+
+        [HttpGet("ConfirmEmail")]
+        public async Task<IActionResult> ConfirmEmail(string userName, string token)
+        {
+            var result = await _authRepository.ConfirmEmailAsync(userName, token);
+            if (result)
+            {
+                return new RedirectResult("http://localhost:3000/signin?confirmEmail=true");
+            }
+            return new BadRequestObjectResult("Error confirming email");
+        }
+
 
         [HttpPost("Login-2FA-Email")]
         public async Task<IActionResult> loginOTPEmail(VerifyUser userFA)

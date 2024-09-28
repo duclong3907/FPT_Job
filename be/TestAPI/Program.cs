@@ -82,14 +82,15 @@ builder.Services.AddAuthentication(options =>
     facebookOptions.CallbackPath = "/signin-facebook";
 });
 
-// Register repositories
+//// Register repositories
 builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
+builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 builder.Services.AddScoped<IUrlHelper>(provider =>
 {
-var actionContext = provider.GetRequiredService<IActionContextAccessor>().ActionContext;
-return provider.GetRequiredService<IUrlHelperFactory>().GetUrlHelper(actionContext);
+    var actionContext = provider.GetRequiredService<IActionContextAccessor>().ActionContext;
+    return provider.GetRequiredService<IUrlHelperFactory>().GetUrlHelper(actionContext);
 });
-//builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
